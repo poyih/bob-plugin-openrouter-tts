@@ -1,0 +1,167 @@
+{
+  "identifier": "bob-plugin-openrouter-tts",
+  "version": "1.0.1",
+  "category": "tts",
+  "name": "OpenRouter TTS",
+  "summary": "使用 OpenRouter TTS API 进行语音合成。",
+  "icon": "",
+  "author": "poyih & Claude",
+  "homepage": "https://github.com/poyih/bob-plugin-openrouter-tts",
+  "appcast": "https://github.com/poyih/bob-plugin-openrouter-tts/raw/main/appcast.json",
+  "minBobVersion": "1.8.0",
+  "options": [
+    {
+      "identifier": "apiKey",
+      "type": "text",
+      "title": "API Key",
+      "defaultValue": "",
+      "textConfig": {
+        "type": "secure",
+        "placeholderText": "sk-or-v1-..."
+      }
+    },
+    {
+      "identifier": "apiUrl",
+      "type": "text",
+      "title": "API URL",
+      "defaultValue": "https://openrouter.ai/api/v1/audio/speech",
+      "desc": "OpenRouter TTS 接口地址。支持填写 https://openrouter.ai、https://openrouter.ai/api、https://openrouter.ai/api/v1、完整 /audio/speech 地址，或 legacy/custom /tts 地址。",
+      "textConfig": {
+        "type": "visible",
+        "placeholderText": "https://openrouter.ai/api/v1/audio/speech"
+      }
+    },
+    {
+      "identifier": "model",
+      "type": "menu",
+      "title": "Model",
+      "defaultValue": "google/gemini-3.1-flash-tts-preview",
+      "menuValues": [
+        { "title": "Gemini 3.1 Flash TTS Preview", "value": "google/gemini-3.1-flash-tts-preview" },
+        { "title": "Gemini 2.5 Flash TTS Preview", "value": "google/gemini-2.5-flash-preview-tts" },
+        { "title": "OpenAI gpt-4o-mini-tts", "value": "openai/gpt-4o-mini-tts" },
+        { "title": "Custom Model ID", "value": "custom" }
+      ]
+    },
+    {
+      "identifier": "customModel",
+      "type": "text",
+      "title": "Custom Model ID",
+      "defaultValue": "",
+      "desc": "可选。填写完整 OpenRouter 模型 ID 时，会覆盖上方 Model 预设。",
+      "textConfig": {
+        "type": "visible",
+        "placeholderText": "google/gemini-3.1-flash-tts-preview"
+      }
+    },
+    {
+      "identifier": "voiceGemini",
+      "type": "menu",
+      "title": "Voice (Gemini TTS)",
+      "description": "用于 google/gemini-* TTS 模型。",
+      "defaultValue": "Kore",
+      "menuValues": [
+        { "title": "Zephyr - Bright (明亮)", "value": "Zephyr" },
+        { "title": "Puck - Upbeat (欢快)", "value": "Puck" },
+        { "title": "Charon - Informative (信息型)", "value": "Charon" },
+        { "title": "Kore - Firm (沉稳)", "value": "Kore" },
+        { "title": "Fenrir - Excitable (活泼)", "value": "Fenrir" },
+        { "title": "Leda - Youthful (年轻)", "value": "Leda" },
+        { "title": "Orus - Firm (沉稳)", "value": "Orus" },
+        { "title": "Aoede - Breezy (轻快)", "value": "Aoede" },
+        { "title": "Callirrhoe - Easy-going (随和)", "value": "Callirrhoe" },
+        { "title": "Autonoe - Bright (明亮)", "value": "Autonoe" },
+        { "title": "Enceladus - Breathy (气声)", "value": "Enceladus" },
+        { "title": "Iapetus - Clear (清晰)", "value": "Iapetus" },
+        { "title": "Umbriel - Easy-going (随和)", "value": "Umbriel" },
+        { "title": "Algieba - Smooth (柔滑)", "value": "Algieba" },
+        { "title": "Despina - Smooth (柔滑)", "value": "Despina" },
+        { "title": "Erinome - Clear (清晰)", "value": "Erinome" },
+        { "title": "Algenib - Gravelly (沙哑)", "value": "Algenib" },
+        { "title": "Rasalgethi - Informative (信息型)", "value": "Rasalgethi" },
+        { "title": "Laomedeia - Upbeat (欢快)", "value": "Laomedeia" },
+        { "title": "Achernar - Soft (柔和)", "value": "Achernar" },
+        { "title": "Alnilam - Firm (沉稳)", "value": "Alnilam" },
+        { "title": "Schedar - Even (平稳)", "value": "Schedar" },
+        { "title": "Gacrux - Mature (成熟)", "value": "Gacrux" },
+        { "title": "Pulcherrima - Forward (直率)", "value": "Pulcherrima" },
+        { "title": "Achird - Friendly (友好)", "value": "Achird" },
+        { "title": "Zubenelgenubi - Casual (休闲)", "value": "Zubenelgenubi" },
+        { "title": "Vindemiatrix - Gentle (温柔)", "value": "Vindemiatrix" },
+        { "title": "Sadachbia - Lively (生动)", "value": "Sadachbia" },
+        { "title": "Sadaltager - Knowledgeable (博学)", "value": "Sadaltager" },
+        { "title": "Sulafat - Warm (温暖)", "value": "Sulafat" }
+      ]
+    },
+    {
+      "identifier": "voiceOpenAI",
+      "type": "menu",
+      "title": "Voice (OpenAI TTS)",
+      "description": "用于 openai/*、gpt-4o-mini-tts、tts-1 等 OpenAI TTS 模型。",
+      "defaultValue": "marin",
+      "menuValues": [
+        { "title": "alloy", "value": "alloy" },
+        { "title": "ash", "value": "ash" },
+        { "title": "ballad", "value": "ballad" },
+        { "title": "cedar (recommended)", "value": "cedar" },
+        { "title": "coral", "value": "coral" },
+        { "title": "echo", "value": "echo" },
+        { "title": "fable", "value": "fable" },
+        { "title": "marin (recommended)", "value": "marin" },
+        { "title": "onyx", "value": "onyx" },
+        { "title": "nova", "value": "nova" },
+        { "title": "sage", "value": "sage" },
+        { "title": "shimmer", "value": "shimmer" },
+        { "title": "verse", "value": "verse" }
+      ]
+    },
+    {
+      "identifier": "customVoice",
+      "type": "text",
+      "title": "Custom Voice",
+      "defaultValue": "",
+      "desc": "可选。用于无法自动识别为 Gemini 或 OpenAI 的自定义模型。",
+      "textConfig": {
+        "type": "visible",
+        "placeholderText": "填写自定义 voice ID"
+      }
+    },
+    {
+      "identifier": "responseFormat",
+      "type": "menu",
+      "title": "Audio Format",
+      "defaultValue": "pcm",
+      "menuValues": [
+        { "title": "PCM 24k (wrap to WAV for Bob)", "value": "pcm" },
+        { "title": "MP3 (if supported by provider)", "value": "mp3" }
+      ]
+    },
+    {
+      "identifier": "speed",
+      "type": "menu",
+      "title": "Speed",
+      "defaultValue": "1.0",
+      "desc": "部分 OpenRouter provider 可能会忽略该参数。",
+      "menuValues": [
+        { "title": "0.5x", "value": "0.5" },
+        { "title": "0.75x", "value": "0.75" },
+        { "title": "1.0x (default)", "value": "1.0" },
+        { "title": "1.25x", "value": "1.25" },
+        { "title": "1.5x", "value": "1.5" },
+        { "title": "2.0x", "value": "2.0" }
+      ]
+    },
+    {
+      "identifier": "instructions",
+      "type": "text",
+      "title": "Instructions / Audio Tags",
+      "defaultValue": "",
+      "desc": "可选。会作为前缀拼到待合成文本前，适合填写 Gemini audio tags 或简短风格提示。",
+      "textConfig": {
+        "type": "visible",
+        "height": 80,
+        "placeholderText": "例如：[excited]、[whispers]、[short pause]"
+      }
+    }
+  ]
+}

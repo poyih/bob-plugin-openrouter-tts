@@ -1,0 +1,13 @@
+{
+  "identifier": "bob-plugin-openrouter-tts",
+  "versions": [
+    {
+      "version": "1.0.1",
+      "desc": "区分 Gemini TTS 与 OpenAI TTS 的 voice 选择，并增加自定义 voice",
+      "sha256": "9adefdcef73af743956c83ebcd4fe296bec2bacce4907366bc59d52476e23d6e",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.0.1/openrouter-tts-1.0.1.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1777123429000
+    }
+  ]
+}
