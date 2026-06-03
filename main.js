@@ -9,8 +9,28 @@ var CACHE_MAX_ENTRIES = 10;
 var CACHE_MAX_VALUE_CHARS = 3 * 1024 * 1024;
 var DEFAULT_API_URL = 'https://openrouter.ai/api/v1/audio/speech';
 var DEFAULT_MODEL = 'google/gemini-3.1-flash-tts-preview';
-var DEFAULT_GEMINI_VOICE = 'Kore';
-var DEFAULT_OPENAI_VOICE = 'marin';
+var VOICE_OPTION_BY_FAMILY = {
+    gemini: 'voiceGemini',
+    openai: 'voiceOpenAI',
+    microsoft: 'voiceMicrosoft',
+    grok: 'voiceGrok',
+    zyphra: 'voiceZyphra',
+    sesame: 'voiceSesame',
+    orpheus: 'voiceOrpheus',
+    kokoro: 'voiceKokoro',
+    voxtral: 'voiceVoxtral'
+};
+var DEFAULT_VOICE_BY_FAMILY = {
+    gemini: 'Kore',
+    openai: 'marin',
+    microsoft: 'en-US-Harper:MAI-Voice-2',
+    grok: 'eve',
+    zyphra: 'american_female',
+    sesame: 'conversational_a',
+    orpheus: 'tara',
+    kokoro: 'af_heart',
+    voxtral: 'en_paul_neutral'
+};
 var AUDIO_CACHE = {};
 var AUDIO_CACHE_ORDER = [];
 
@@ -78,30 +98,51 @@ function getModel() {
     return preset === 'custom' ? '' : preset;
 }
 
-function isGeminiTtsModel(model) {
+function getModelFamily(model) {
     var value = String(model || '').toLowerCase();
-    return value.indexOf('google/gemini-') === 0 || value.indexOf('gemini-') === 0;
-}
 
-function isOpenAiTtsModel(model) {
-    var value = String(model || '').toLowerCase();
-    return value.indexOf('openai/') === 0 ||
+    if (value.indexOf('gemini') !== -1) {
+        return 'gemini';
+    }
+    if (value.indexOf('openai/') === 0 ||
         value.indexOf('gpt-4o-mini-tts') !== -1 ||
-        value === 'tts-1' ||
-        value === 'tts-1-hd';
+        value.indexOf('tts-1') === 0) {
+        return 'openai';
+    }
+    if (value.indexOf('microsoft/') === 0 || value.indexOf('mai-voice') !== -1) {
+        return 'microsoft';
+    }
+    if (value.indexOf('x-ai/') === 0 || value.indexOf('grok-voice') !== -1) {
+        return 'grok';
+    }
+    if (value.indexOf('zyphra/') === 0 || value.indexOf('zonos') !== -1) {
+        return 'zyphra';
+    }
+    if (value.indexOf('sesame/') === 0 || value.indexOf('csm') !== -1) {
+        return 'sesame';
+    }
+    if (value.indexOf('canopylabs/') === 0 || value.indexOf('orpheus') !== -1) {
+        return 'orpheus';
+    }
+    if (value.indexOf('hexgrad/') === 0 || value.indexOf('kokoro') !== -1) {
+        return 'kokoro';
+    }
+    if (value.indexOf('mistralai/') === 0 || value.indexOf('voxtral') !== -1) {
+        return 'voxtral';
+    }
+
+    return 'custom';
 }
 
 function getVoice() {
-    var model = getModel();
+    var family = getModelFamily(getModel());
+    var customVoice = readOption('customVoice');
 
-    if (isGeminiTtsModel(model)) {
-        return readOption('voiceGemini') || readOption('voice') || DEFAULT_GEMINI_VOICE;
-    }
-    if (isOpenAiTtsModel(model)) {
-        return readOption('voiceOpenAI') || DEFAULT_OPENAI_VOICE;
+    if (family === 'custom') {
+        return customVoice || readOption('voiceGemini') || DEFAULT_VOICE_BY_FAMILY.gemini;
     }
 
-    return readOption('customVoice') || readOption('voiceGemini') || readOption('voice') || DEFAULT_GEMINI_VOICE;
+    return readOption(VOICE_OPTION_BY_FAMILY[family]) || customVoice || DEFAULT_VOICE_BY_FAMILY[family];
 }
 
 function getResponseFormat() {
@@ -306,13 +347,16 @@ function buildInputText(text, instructions) {
 }
 
 function buildSpeechRequestBody(inputText, model, voice, format, speed) {
-    return {
+    var body = {
         model: model,
         input: inputText,
         voice: voice,
-        response_format: format,
-        speed: speed
+        response_format: format
     };
+    if (typeof speed === 'number' && !isNaN(speed) && speed !== 1.0) {
+        body.speed = speed;
+    }
+    return body;
 }
 
 function getApiErrorMessage(resp) {
@@ -403,26 +447,77 @@ function responseHasAudio(resp) {
     return !!(resp && (resp.rawData || getInlineAudioData(resp)));
 }
 
-function shouldWrapPcm(format, mimeType) {
-    var lowerFormat = String(format || '').toLowerCase();
-    var lowerMimeType = String(mimeType || '').toLowerCase();
-    if (lowerMimeType.indexOf('wav') !== -1 || lowerMimeType.indexOf('mpeg') !== -1 || lowerMimeType.indexOf('mp3') !== -1) {
-        return false;
+function decodeBase64Prefix(base64, byteCount) {
+    var clean = String(base64 || '').replace(/^data:[^,]+,/, '').replace(/\s+/g, '');
+    var charsNeeded = Math.ceil((byteCount + 2) / 3) * 4;
+    return base64Decode(clean.substring(0, charsNeeded));
+}
+
+function sniffAudioContainer(bytes) {
+    if (!bytes || bytes.length < 4) {
+        return '';
     }
-    return lowerFormat === 'pcm' || lowerMimeType.indexOf('pcm') !== -1 || lowerMimeType.indexOf('l16') !== -1;
+    var b0 = bytes[0], b1 = bytes[1], b2 = bytes[2], b3 = bytes[3];
+
+    if (b0 === 0x52 && b1 === 0x49 && b2 === 0x46 && b3 === 0x46) {
+        return 'wav';
+    }
+    if (b0 === 0x4F && b1 === 0x67 && b2 === 0x67 && b3 === 0x53) {
+        return 'ogg';
+    }
+    if (b0 === 0x66 && b1 === 0x4C && b2 === 0x61 && b3 === 0x43) {
+        return 'flac';
+    }
+    if (b0 === 0x49 && b1 === 0x44 && b2 === 0x33) {
+        return 'mp3';
+    }
+    if (b0 === 0xFF && (b1 & 0xE0) === 0xE0) {
+        return 'mp3';
+    }
+
+    return '';
+}
+
+function mimeTypeToContainer(mimeType) {
+    var lower = String(mimeType || '').toLowerCase();
+    if (lower.indexOf('wav') !== -1) {
+        return 'wav';
+    }
+    if (lower.indexOf('mpeg') !== -1 || lower.indexOf('mp3') !== -1) {
+        return 'mp3';
+    }
+    if (lower.indexOf('ogg') !== -1 || lower.indexOf('opus') !== -1) {
+        return 'ogg';
+    }
+    if (lower.indexOf('flac') !== -1) {
+        return 'flac';
+    }
+    if (lower.indexOf('aac') !== -1) {
+        return 'aac';
+    }
+    return '';
 }
 
 function processAudioBase64(audioBase64, format, mimeType) {
-    if (shouldWrapPcm(format, mimeType)) {
-        return {
-            value: pcmToWav(audioBase64),
-            outputFormat: 'wav'
-        };
+    var lowerMimeType = String(mimeType || '').toLowerCase();
+
+    var declaredContainer = mimeTypeToContainer(lowerMimeType);
+    if (declaredContainer) {
+        return { value: audioBase64, outputFormat: declaredContainer };
     }
-    return {
-        value: audioBase64,
-        outputFormat: format || 'audio'
-    };
+
+    var sniffedContainer = sniffAudioContainer(decodeBase64Prefix(audioBase64, 4));
+    if (sniffedContainer) {
+        return { value: audioBase64, outputFormat: sniffedContainer };
+    }
+
+    if (String(format || '').toLowerCase() === 'pcm' ||
+        lowerMimeType.indexOf('pcm') !== -1 ||
+        lowerMimeType.indexOf('l16') !== -1) {
+        return { value: pcmToWav(audioBase64), outputFormat: 'wav' };
+    }
+
+    return { value: audioBase64, outputFormat: format || 'audio' };
 }
 
 function pluginValidate(completion) {

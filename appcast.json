@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.1.0",
+      "desc": "接入 OpenRouter 全部 speech-output 模型（10 个），每个模型独立音色菜单；按返回音频 magic bytes 自动识别 WAV/MP3/Ogg/FLAC，Speed 仅在非 1.0x 时发送",
+      "sha256": "f31ddcb3ec29bbf4358571b45382a13c40d2dbe68a0bc70a7e91fa677fe563f1",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.1.0/openrouter-tts-1.1.0.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1780458100000
+    },
+    {
       "version": "1.0.1",
       "desc": "区分 Gemini TTS 与 OpenAI TTS 的 voice 选择，并增加自定义 voice",
       "sha256": "9adefdcef73af743956c83ebcd4fe296bec2bacce4907366bc59d52476e23d6e",

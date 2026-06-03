@@ -1,9 +1,9 @@
 {
   "identifier": "bob-plugin-openrouter-tts",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "category": "tts",
   "name": "OpenRouter TTS",
-  "summary": "使用 OpenRouter TTS API 进行语音合成。",
+  "summary": "使用 OpenRouter TTS API 进行语音合成，覆盖全部 speech-output 模型。",
   "icon": "",
   "author": "poyih & Claude",
   "homepage": "https://github.com/poyih/bob-plugin-openrouter-tts",
@@ -36,10 +36,18 @@
       "type": "menu",
       "title": "Model",
       "defaultValue": "google/gemini-3.1-flash-tts-preview",
+      "desc": "OpenRouter speech-output 模型。选中某个模型后，请在下方对应的 Voice 菜单里挑选音色。",
       "menuValues": [
-        { "title": "Gemini 3.1 Flash TTS Preview", "value": "google/gemini-3.1-flash-tts-preview" },
-        { "title": "Gemini 2.5 Flash TTS Preview", "value": "google/gemini-2.5-flash-preview-tts" },
-        { "title": "OpenAI gpt-4o-mini-tts", "value": "openai/gpt-4o-mini-tts" },
+        { "title": "Gemini 3.1 Flash TTS Preview (Google)", "value": "google/gemini-3.1-flash-tts-preview" },
+        { "title": "GPT-4o Mini TTS (OpenAI)", "value": "openai/gpt-4o-mini-tts-2025-12-15" },
+        { "title": "MAI-Voice-2 (Microsoft)", "value": "microsoft/mai-voice-2" },
+        { "title": "Grok Voice TTS 1.0 (xAI)", "value": "x-ai/grok-voice-tts-1.0" },
+        { "title": "Zonos v0.1 Transformer (Zyphra)", "value": "zyphra/zonos-v0.1-transformer" },
+        { "title": "Zonos v0.1 Hybrid (Zyphra)", "value": "zyphra/zonos-v0.1-hybrid" },
+        { "title": "CSM 1B (Sesame)", "value": "sesame/csm-1b" },
+        { "title": "Orpheus 3B (Canopy Labs)", "value": "canopylabs/orpheus-3b-0.1-ft" },
+        { "title": "Kokoro 82M (hexgrad)", "value": "hexgrad/kokoro-82m" },
+        { "title": "Voxtral Mini TTS (Mistral)", "value": "mistralai/voxtral-mini-tts-2603" },
         { "title": "Custom Model ID", "value": "custom" }
       ]
     },
@@ -48,7 +56,7 @@
       "type": "text",
       "title": "Custom Model ID",
       "defaultValue": "",
-      "desc": "可选。填写完整 OpenRouter 模型 ID 时，会覆盖上方 Model 预设。",
+      "desc": "可选。填写完整 OpenRouter 模型 ID 时，会覆盖上方 Model 预设。无法自动识别音色家族时，请使用下方 Custom Voice。",
       "textConfig": {
         "type": "visible",
         "placeholderText": "google/gemini-3.1-flash-tts-preview"
@@ -57,8 +65,8 @@
     {
       "identifier": "voiceGemini",
       "type": "menu",
-      "title": "Voice (Gemini TTS)",
-      "description": "用于 google/gemini-* TTS 模型。",
+      "title": "Voice · Gemini",
+      "desc": "用于 google/gemini-* TTS 模型。",
       "defaultValue": "Kore",
       "menuValues": [
         { "title": "Zephyr - Bright (明亮)", "value": "Zephyr" },
@@ -96,8 +104,8 @@
     {
       "identifier": "voiceOpenAI",
       "type": "menu",
-      "title": "Voice (OpenAI TTS)",
-      "description": "用于 openai/*、gpt-4o-mini-tts、tts-1 等 OpenAI TTS 模型。",
+      "title": "Voice · OpenAI",
+      "desc": "用于 openai/gpt-4o-mini-tts 等 OpenAI TTS 模型。",
       "defaultValue": "marin",
       "menuValues": [
         { "title": "alloy", "value": "alloy" },
@@ -116,11 +124,186 @@
       ]
     },
     {
+      "identifier": "voiceMicrosoft",
+      "type": "menu",
+      "title": "Voice · Microsoft MAI",
+      "desc": "用于 microsoft/mai-voice-2。",
+      "defaultValue": "en-US-Harper:MAI-Voice-2",
+      "menuValues": [
+        { "title": "Harper - English US (英语·女)", "value": "en-US-Harper:MAI-Voice-2" },
+        { "title": "Valeria - Spanish MX (西语·女)", "value": "es-MX-Valeria:MAI-Voice-2" },
+        { "title": "Soleil - French FR (法语·女)", "value": "fr-FR-Soleil:MAI-Voice-2" },
+        { "title": "Klaus - German DE (德语·男)", "value": "de-DE-Klaus:MAI-Voice-2" }
+      ]
+    },
+    {
+      "identifier": "voiceGrok",
+      "type": "menu",
+      "title": "Voice · Grok",
+      "desc": "用于 x-ai/grok-voice-tts-1.0。",
+      "defaultValue": "eve",
+      "menuValues": [
+        { "title": "eve", "value": "eve" },
+        { "title": "ara", "value": "ara" },
+        { "title": "rex", "value": "rex" },
+        { "title": "sal", "value": "sal" },
+        { "title": "leo", "value": "leo" }
+      ]
+    },
+    {
+      "identifier": "voiceZyphra",
+      "type": "menu",
+      "title": "Voice · Zyphra Zonos",
+      "desc": "用于 zyphra/zonos-v0.1-transformer 与 zyphra/zonos-v0.1-hybrid。",
+      "defaultValue": "american_female",
+      "menuValues": [
+        { "title": "American Female (美式·女)", "value": "american_female" },
+        { "title": "American Male (美式·男)", "value": "american_male" },
+        { "title": "British Female (英式·女)", "value": "british_female" },
+        { "title": "British Male (英式·男)", "value": "british_male" },
+        { "title": "Random (随机)", "value": "random" }
+      ]
+    },
+    {
+      "identifier": "voiceSesame",
+      "type": "menu",
+      "title": "Voice · Sesame CSM",
+      "desc": "用于 sesame/csm-1b。",
+      "defaultValue": "conversational_a",
+      "menuValues": [
+        { "title": "Conversational A (对话型)", "value": "conversational_a" },
+        { "title": "Conversational B (对话型)", "value": "conversational_b" },
+        { "title": "Read Speech A (朗读型)", "value": "read_speech_a" },
+        { "title": "Read Speech B (朗读型)", "value": "read_speech_b" },
+        { "title": "Read Speech C (朗读型)", "value": "read_speech_c" },
+        { "title": "Read Speech D (朗读型)", "value": "read_speech_d" },
+        { "title": "None (无预设)", "value": "none" }
+      ]
+    },
+    {
+      "identifier": "voiceOrpheus",
+      "type": "menu",
+      "title": "Voice · Orpheus",
+      "desc": "用于 canopylabs/orpheus-3b-0.1-ft。",
+      "defaultValue": "tara",
+      "menuValues": [
+        { "title": "tara", "value": "tara" },
+        { "title": "leah", "value": "leah" },
+        { "title": "jess", "value": "jess" },
+        { "title": "leo", "value": "leo" },
+        { "title": "dan", "value": "dan" },
+        { "title": "mia", "value": "mia" },
+        { "title": "zac", "value": "zac" }
+      ]
+    },
+    {
+      "identifier": "voiceKokoro",
+      "type": "menu",
+      "title": "Voice · Kokoro",
+      "desc": "用于 hexgrad/kokoro-82m。前缀：a=美式英语 b=英式英语 e=西语 f=法语 h=印地语 i=意语 j=日语 p=葡语 z=中文；f=女 m=男。",
+      "defaultValue": "af_heart",
+      "menuValues": [
+        { "title": "af_heart — US English (F)", "value": "af_heart" },
+        { "title": "af_alloy — US English (F)", "value": "af_alloy" },
+        { "title": "af_aoede — US English (F)", "value": "af_aoede" },
+        { "title": "af_bella — US English (F)", "value": "af_bella" },
+        { "title": "af_jessica — US English (F)", "value": "af_jessica" },
+        { "title": "af_kore — US English (F)", "value": "af_kore" },
+        { "title": "af_nicole — US English (F)", "value": "af_nicole" },
+        { "title": "af_nova — US English (F)", "value": "af_nova" },
+        { "title": "af_river — US English (F)", "value": "af_river" },
+        { "title": "af_sarah — US English (F)", "value": "af_sarah" },
+        { "title": "af_sky — US English (F)", "value": "af_sky" },
+        { "title": "am_adam — US English (M)", "value": "am_adam" },
+        { "title": "am_echo — US English (M)", "value": "am_echo" },
+        { "title": "am_eric — US English (M)", "value": "am_eric" },
+        { "title": "am_fenrir — US English (M)", "value": "am_fenrir" },
+        { "title": "am_liam — US English (M)", "value": "am_liam" },
+        { "title": "am_michael — US English (M)", "value": "am_michael" },
+        { "title": "am_onyx — US English (M)", "value": "am_onyx" },
+        { "title": "am_puck — US English (M)", "value": "am_puck" },
+        { "title": "am_santa — US English (M)", "value": "am_santa" },
+        { "title": "bf_alice — British English (F)", "value": "bf_alice" },
+        { "title": "bf_emma — British English (F)", "value": "bf_emma" },
+        { "title": "bf_isabella — British English (F)", "value": "bf_isabella" },
+        { "title": "bf_lily — British English (F)", "value": "bf_lily" },
+        { "title": "bm_daniel — British English (M)", "value": "bm_daniel" },
+        { "title": "bm_fable — British English (M)", "value": "bm_fable" },
+        { "title": "bm_george — British English (M)", "value": "bm_george" },
+        { "title": "bm_lewis — British English (M)", "value": "bm_lewis" },
+        { "title": "ef_dora — Spanish (F)", "value": "ef_dora" },
+        { "title": "em_alex — Spanish (M)", "value": "em_alex" },
+        { "title": "em_santa — Spanish (M)", "value": "em_santa" },
+        { "title": "ff_siwis — French (F)", "value": "ff_siwis" },
+        { "title": "hf_alpha — Hindi (F)", "value": "hf_alpha" },
+        { "title": "hf_beta — Hindi (F)", "value": "hf_beta" },
+        { "title": "hm_omega — Hindi (M)", "value": "hm_omega" },
+        { "title": "hm_psi — Hindi (M)", "value": "hm_psi" },
+        { "title": "if_sara — Italian (F)", "value": "if_sara" },
+        { "title": "im_nicola — Italian (M)", "value": "im_nicola" },
+        { "title": "jf_alpha — Japanese (F)", "value": "jf_alpha" },
+        { "title": "jf_gongitsune — Japanese (F)", "value": "jf_gongitsune" },
+        { "title": "jf_nezumi — Japanese (F)", "value": "jf_nezumi" },
+        { "title": "jf_tebukuro — Japanese (F)", "value": "jf_tebukuro" },
+        { "title": "jm_kumo — Japanese (M)", "value": "jm_kumo" },
+        { "title": "pf_dora — Portuguese (F)", "value": "pf_dora" },
+        { "title": "pm_alex — Portuguese (M)", "value": "pm_alex" },
+        { "title": "pm_santa — Portuguese (M)", "value": "pm_santa" },
+        { "title": "zf_xiaobei — Chinese (F)", "value": "zf_xiaobei" },
+        { "title": "zf_xiaoni — Chinese (F)", "value": "zf_xiaoni" },
+        { "title": "zf_xiaoxiao — Chinese (F)", "value": "zf_xiaoxiao" },
+        { "title": "zf_xiaoyi — Chinese (F)", "value": "zf_xiaoyi" },
+        { "title": "zm_yunjian — Chinese (M)", "value": "zm_yunjian" },
+        { "title": "zm_yunxi — Chinese (M)", "value": "zm_yunxi" },
+        { "title": "zm_yunxia — Chinese (M)", "value": "zm_yunxia" },
+        { "title": "zm_yunyang — Chinese (M)", "value": "zm_yunyang" }
+      ]
+    },
+    {
+      "identifier": "voiceVoxtral",
+      "type": "menu",
+      "title": "Voice · Voxtral",
+      "desc": "用于 mistralai/voxtral-mini-tts-2603。音色自带情绪。",
+      "defaultValue": "en_paul_neutral",
+      "menuValues": [
+        { "title": "Paul · Neutral (EN)", "value": "en_paul_neutral" },
+        { "title": "Paul · Happy (EN)", "value": "en_paul_happy" },
+        { "title": "Paul · Cheerful (EN)", "value": "en_paul_cheerful" },
+        { "title": "Paul · Excited (EN)", "value": "en_paul_excited" },
+        { "title": "Paul · Confident (EN)", "value": "en_paul_confident" },
+        { "title": "Paul · Sad (EN)", "value": "en_paul_sad" },
+        { "title": "Paul · Frustrated (EN)", "value": "en_paul_frustrated" },
+        { "title": "Paul · Angry (EN)", "value": "en_paul_angry" },
+        { "title": "Oliver · Neutral (GB)", "value": "gb_oliver_neutral" },
+        { "title": "Oliver · Cheerful (GB)", "value": "gb_oliver_cheerful" },
+        { "title": "Oliver · Excited (GB)", "value": "gb_oliver_excited" },
+        { "title": "Oliver · Curious (GB)", "value": "gb_oliver_curious" },
+        { "title": "Oliver · Confident (GB)", "value": "gb_oliver_confident" },
+        { "title": "Oliver · Sad (GB)", "value": "gb_oliver_sad" },
+        { "title": "Oliver · Angry (GB)", "value": "gb_oliver_angry" },
+        { "title": "Jane · Neutral (GB)", "value": "gb_jane_neutral" },
+        { "title": "Jane · Confident (GB)", "value": "gb_jane_confident" },
+        { "title": "Jane · Curious (GB)", "value": "gb_jane_curious" },
+        { "title": "Jane · Sarcasm (GB)", "value": "gb_jane_sarcasm" },
+        { "title": "Jane · Confused (GB)", "value": "gb_jane_confused" },
+        { "title": "Jane · Shameful (GB)", "value": "gb_jane_shameful" },
+        { "title": "Jane · Jealousy (GB)", "value": "gb_jane_jealousy" },
+        { "title": "Jane · Frustrated (GB)", "value": "gb_jane_frustrated" },
+        { "title": "Jane · Sad (GB)", "value": "gb_jane_sad" },
+        { "title": "Marie · Neutral (FR)", "value": "fr_marie_neutral" },
+        { "title": "Marie · Happy (FR)", "value": "fr_marie_happy" },
+        { "title": "Marie · Excited (FR)", "value": "fr_marie_excited" },
+        { "title": "Marie · Curious (FR)", "value": "fr_marie_curious" },
+        { "title": "Marie · Sad (FR)", "value": "fr_marie_sad" },
+        { "title": "Marie · Angry (FR)", "value": "fr_marie_angry" }
+      ]
+    },
+    {
       "identifier": "customVoice",
       "type": "text",
       "title": "Custom Voice",
       "defaultValue": "",
-      "desc": "可选。用于无法自动识别为 Gemini 或 OpenAI 的自定义模型。",
+      "desc": "可选。用于无法自动识别音色家族的自定义模型；填写后会覆盖该模型的默认音色。",
       "textConfig": {
         "type": "visible",
         "placeholderText": "填写自定义 voice ID"
@@ -131,9 +314,13 @@
       "type": "menu",
       "title": "Audio Format",
       "defaultValue": "pcm",
+      "desc": "pcm 会被包装成 WAV 给 Bob 播放；其余格式需 provider 支持，插件会按返回的实际音频自动识别。",
       "menuValues": [
-        { "title": "PCM 24k (wrap to WAV for Bob)", "value": "pcm" },
-        { "title": "MP3 (if supported by provider)", "value": "mp3" }
+        { "title": "PCM 24k (wrap to WAV)", "value": "pcm" },
+        { "title": "WAV (if supported)", "value": "wav" },
+        { "title": "MP3 (if supported)", "value": "mp3" },
+        { "title": "Opus (if supported)", "value": "opus" },
+        { "title": "FLAC (if supported)", "value": "flac" }
       ]
     },
     {
@@ -141,7 +328,7 @@
       "type": "menu",
       "title": "Speed",
       "defaultValue": "1.0",
-      "desc": "部分 OpenRouter provider 可能会忽略该参数。",
+      "desc": "仅在非 1.0x 时发送；部分 OpenRouter provider 可能会忽略该参数。",
       "menuValues": [
         { "title": "0.5x", "value": "0.5" },
         { "title": "0.75x", "value": "0.75" },
