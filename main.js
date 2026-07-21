@@ -2,13 +2,15 @@ var BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567
 var LOG_PREFIX = '[bob-plugin-openrouter-tts]';
 var REQUEST_COUNTER = 0;
 var PLUGIN_TIMEOUT_INTERVAL = 120;
-var TTS_REQUEST_TIMEOUT_INTERVAL = 115;
+var TTS_REQUEST_TIMEOUT_INTERVAL = 105;
 var VALIDATION_TIMEOUT_INTERVAL = 30;
 var MAX_TEXT_LENGTH = 4096;
 var CACHE_MAX_ENTRIES = 10;
 var CACHE_MAX_VALUE_CHARS = 3 * 1024 * 1024;
+var CACHE_TTL_MS = 30 * 60 * 1000;
 var DEFAULT_API_URL = 'https://openrouter.ai/api/v1/audio/speech';
 var DEFAULT_MODEL = 'google/gemini-3.1-flash-tts-preview';
+// minimax 与 custom 家族无预设音色菜单，由 getVoice() 特判走 customVoice，故不在此二映射中。
 var VOICE_OPTION_BY_FAMILY = {
     gemini: 'voiceGemini',
     microsoft: 'voiceMicrosoft',
@@ -113,7 +115,7 @@ function getModelFamily(model) {
     if (value.indexOf('zyphra/') === 0 || value.indexOf('zonos') !== -1) {
         return 'zyphra';
     }
-    if (value.indexOf('sesame/') === 0 || value.indexOf('csm') !== -1) {
+    if (value.indexOf('sesame/') === 0 || value.indexOf('csm-1b') !== -1) {
         return 'sesame';
     }
     if (value.indexOf('canopylabs/') === 0 || value.indexOf('orpheus') !== -1) {
@@ -139,12 +141,8 @@ function getVoice() {
     var family = getModelFamily(getModel());
     var customVoice = readOption('customVoice');
 
-    if (family === 'minimax') {
+    if (family === 'minimax' || family === 'custom') {
         return customVoice;
-    }
-
-    if (family === 'custom') {
-        return customVoice || readOption('voiceGemini') || DEFAULT_VOICE_BY_FAMILY.gemini;
     }
 
     return readOption(VOICE_OPTION_BY_FAMILY[family]) || customVoice || DEFAULT_VOICE_BY_FAMILY[family];
@@ -157,6 +155,11 @@ function getResponseFormat() {
 function getSpeed() {
     var speed = parseFloat(readOption('speed'));
     return isNaN(speed) ? 1.0 : speed;
+}
+
+function getSampleRate() {
+    var rate = parseInt(readOption('pcmSampleRate'), 10);
+    return rate > 0 ? rate : 24000;
 }
 
 function isOpenRouterBaseUrl(base) {
@@ -193,6 +196,10 @@ function validateOptions() {
         return { type: 'param', message: '请先填写 OpenRouter TTS 模型 ID。' };
     }
     if (!getVoice()) {
+        var family = getModelFamily(getModel());
+        if (family === 'custom' || family === 'minimax') {
+            return { type: 'param', message: '当前模型无预设音色，请先在 Custom Voice 中填写音色 ID。' };
+        }
         return { type: 'param', message: '请先在插件设置中选择音色。' };
     }
     return null;
@@ -236,6 +243,10 @@ function trimAudioCache() {
 function getCachedAudioResult(key) {
     var entry = AUDIO_CACHE[key];
     if (!entry) {
+        return null;
+    }
+    if (nowMs() - entry.storedAt > CACHE_TTL_MS) {
+        deleteCacheKey(key);
         return null;
     }
     touchCacheKey(key);
@@ -315,10 +326,10 @@ function writeString(view, offset, str) {
     }
 }
 
-function pcmToWav(pcmBase64) {
+function pcmToWav(pcmBase64, sampleRate) {
     var pcmData = base64Decode(pcmBase64);
     var pcmLen = pcmData.length;
-    var sampleRate = 24000;
+    sampleRate = sampleRate || 24000;
     var numChannels = 1;
     var bitsPerSample = 16;
     var byteRate = sampleRate * numChannels * (bitsPerSample / 8);
@@ -465,7 +476,11 @@ function sniffAudioContainer(bytes) {
     var b0 = bytes[0], b1 = bytes[1], b2 = bytes[2], b3 = bytes[3];
 
     if (b0 === 0x52 && b1 === 0x49 && b2 === 0x46 && b3 === 0x46) {
-        return 'wav';
+        if (bytes.length >= 12 && bytes[8] === 0x57 && bytes[9] === 0x41 &&
+            bytes[10] === 0x56 && bytes[11] === 0x45) {
+            return 'wav';
+        }
+        return '';
     }
     if (b0 === 0x4F && b1 === 0x67 && b2 === 0x67 && b3 === 0x53) {
         return 'ogg';
@@ -503,7 +518,7 @@ function mimeTypeToContainer(mimeType) {
     return '';
 }
 
-function processAudioBase64(audioBase64, format, mimeType) {
+function processAudioBase64(audioBase64, format, mimeType, sampleRate) {
     var lowerMimeType = String(mimeType || '').toLowerCase();
 
     var declaredContainer = mimeTypeToContainer(lowerMimeType);
@@ -511,7 +526,7 @@ function processAudioBase64(audioBase64, format, mimeType) {
         return { value: audioBase64, outputFormat: declaredContainer };
     }
 
-    var sniffedContainer = sniffAudioContainer(decodeBase64Prefix(audioBase64, 4));
+    var sniffedContainer = sniffAudioContainer(decodeBase64Prefix(audioBase64, 12));
     if (sniffedContainer) {
         return { value: audioBase64, outputFormat: sniffedContainer };
     }
@@ -519,7 +534,7 @@ function processAudioBase64(audioBase64, format, mimeType) {
     if (String(format || '').toLowerCase() === 'pcm' ||
         lowerMimeType.indexOf('pcm') !== -1 ||
         lowerMimeType.indexOf('l16') !== -1) {
-        return { value: pcmToWav(audioBase64), outputFormat: 'wav' };
+        return { value: pcmToWav(audioBase64, sampleRate), outputFormat: 'wav' };
     }
 
     return { value: audioBase64, outputFormat: format || 'audio' };
@@ -528,7 +543,7 @@ function processAudioBase64(audioBase64, format, mimeType) {
 function pluginValidate(completion) {
     var error = validateOptions();
     if (error) {
-        completion({ error: error });
+        completion({ result: false, error: error });
         return;
     }
 
@@ -544,22 +559,22 @@ function pluginValidate(completion) {
             Authorization: 'Bearer ' + apiKey,
             'Content-Type': 'application/json'
         },
-        body: buildSpeechRequestBody('Hi', model, voice, 'pcm', 1.0),
+        body: buildSpeechRequestBody('Hi', model, voice, getResponseFormat(), 1.0),
         timeout: VALIDATION_TIMEOUT_INTERVAL,
         handler: function(resp) {
             if (resp.error) {
-                completion({ error: toServiceError(resp.error) });
+                completion({ result: false, error: toServiceError(resp.error) });
                 return;
             }
 
             var statusCode = resp.response ? resp.response.statusCode : 0;
             if (statusCode && (statusCode < 200 || statusCode >= 300)) {
-                completion({ error: parseHttpError(resp) });
+                completion({ result: false, error: parseHttpError(resp) });
                 return;
             }
 
             if (!responseHasAudio(resp)) {
-                completion({ error: { type: 'api', message: 'OpenRouter TTS 服务没有返回音频数据。' } });
+                completion({ result: false, error: { type: 'api', message: 'OpenRouter TTS 服务没有返回音频数据。' } });
                 return;
             }
 
@@ -598,6 +613,15 @@ function tts(query, completion) {
     var speed = getSpeed();
     var instructions = readOption('instructions');
     var inputText = buildInputText(text, instructions);
+    if (inputText.length > MAX_TEXT_LENGTH) {
+        completion({
+            error: {
+                type: 'param',
+                message: '文本与 Instructions 合并后超出 ' + MAX_TEXT_LENGTH + ' 字符限制（当前 ' + inputText.length + ' 字符）。'
+            }
+        });
+        return;
+    }
     var apiUrl = getApiUrl();
     var requestId = nextRequestId();
     var requestStartedAt = nowMs();
@@ -681,7 +705,7 @@ function tts(query, completion) {
                 }
 
                 var convertStartedAt = nowMs();
-                var processed = processAudioBase64(rawAudioBase64, format, sourceMimeType);
+                var processed = processAudioBase64(rawAudioBase64, format, sourceMimeType, getSampleRate());
                 var convertElapsedMs = nowMs() - convertStartedAt;
                 var totalElapsedMs = nowMs() - requestStartedAt;
                 var result = createTtsResult(processed.value, model, voice, processed.outputFormat, format, 'miss');
@@ -702,7 +726,7 @@ function tts(query, completion) {
                 completion({ result: result });
             } catch (e) {
                 logTtsError(requestId, 'processing_error', 'request_ms=' + requestElapsedMs + ' total_ms=' + (nowMs() - requestStartedAt) + ' message=' + sanitizeLogValue(e.message || e));
-                completion({ error: { type: 'api', message: '音频处理失败', addition: e.message || String(e) } });
+                completion({ error: { type: 'api', message: '音频处理失败' } });
             }
         }
     });

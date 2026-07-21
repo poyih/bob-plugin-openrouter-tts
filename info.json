@@ -1,6 +1,6 @@
 {
   "identifier": "bob-plugin-openrouter-tts",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "category": "tts",
   "name": "OpenRouter TTS",
   "summary": "使用 OpenRouter TTS API 进行语音合成，覆盖全部 speech-output 模型。",
@@ -1120,9 +1120,8 @@
       "desc": "可选。用于无法自动识别音色家族的自定义模型，以及 MiniMax（speech-2.8-hd / turbo，接受任意音色 ID）；填写后会覆盖该模型的默认音色。",
       "textConfig": {
         "type": "visible",
-        "placeholderText": "填写自定义 voice ID"
-      },
-      "placeholderText": "填写自定义 voice ID（MiniMax 也可）"
+        "placeholderText": "填写自定义 voice ID（MiniMax 也可）"
+      }
     },
     {
       "identifier": "responseFormat",
@@ -1150,6 +1149,39 @@
         {
           "title": "FLAC (if supported)",
           "value": "flac"
+        }
+      ]
+    },
+    {
+      "identifier": "pcmSampleRate",
+      "type": "menu",
+      "title": "PCM Sample Rate",
+      "defaultValue": "24000",
+      "desc": "仅在 Audio Format 为 pcm（包装成 WAV）时生效。绝大多数 OpenRouter provider 的 PCM 为 24kHz；若某 provider 返回其他采样率导致播放变速，可在此调整。",
+      "menuValues": [
+        {
+          "title": "8 kHz",
+          "value": "8000"
+        },
+        {
+          "title": "16 kHz",
+          "value": "16000"
+        },
+        {
+          "title": "22.05 kHz",
+          "value": "22050"
+        },
+        {
+          "title": "24 kHz (default)",
+          "value": "24000"
+        },
+        {
+          "title": "44.1 kHz",
+          "value": "44100"
+        },
+        {
+          "title": "48 kHz",
+          "value": "48000"
         }
       ]
     },

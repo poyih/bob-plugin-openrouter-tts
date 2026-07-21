@@ -42,6 +42,7 @@
 | **Voice · 各家族** | 各模型家族的音色菜单，详见上表 |
 | **Custom Voice** | 可选。用于无法自动识别音色家族的自定义模型 |
 | **Audio Format** | 默认 `pcm`，插件会包装成 WAV 给 Bob 播放；也可选 `wav` / `mp3` / `opus` / `flac`（需 provider 支持） |
+| **PCM Sample Rate** | 仅在 Audio Format 为 `pcm` 时生效，默认 `24 kHz`；若 provider 返回其他采样率的 PCM 导致播放变速，可在此调整 |
 | **Speed** | 语速：0.5x ~ 2.0x，仅在非 1.0x 时发送，部分 provider 可能会忽略 |
 | **Instructions / Audio Tags** | 可选。会作为前缀拼到文本前，适合填写 Gemini audio tags 或简短风格提示 |
 
@@ -129,7 +130,7 @@
 ## 注意事项
 
 - 单次合成文本长度不能超过 4096 个字符。
-- 插件会按返回音频的实际内容（magic bytes）自动识别格式：真正的 WAV / MP3 / Ogg / FLAC 会原样交给 Bob 播放，只有裸 PCM 才会被包装成 24kHz、16-bit、mono WAV。
+- 插件会按返回音频的实际内容（magic bytes）自动识别格式：真正的 WAV / MP3 / Ogg / FLAC 会原样交给 Bob 播放，只有裸 PCM 才会被包装成 16-bit、mono WAV，采样率默认 24kHz，可在 PCM Sample Rate 选项中调整。
 - 如果选择 `mp3` / `wav` 等格式但当前 provider 不支持，OpenRouter 可能会返回错误或退回到默认格式。
 - `Speed` 仅在非 1.0x 时随请求发送，以兼容不支持该参数的模型。
 - 插件会对最近 10 条成功合成结果做内存缓存。
@@ -152,6 +153,13 @@
 ```bash
 zip -j openrouter-tts.bobplugin info.json main.js
 ```
+
+## Changelog
+
+- **1.2.1** — 深度代码检查修复：custom/MiniMax 家族未填音色时明确报错（不再静默回退 Gemini 音色 Kore）；`pcmToWav` 采样率可配置（新增 PCM Sample Rate 选项，默认 24kHz）；`pluginValidate` 使用用户配置的格式而非硬编码 pcm；RIFF 嗅探额外校验 WAVE 标识；音频缓存增加 30 分钟 TTL；收紧 `csm` 子串匹配避免误判；`instructions` 计入 4096 字符长度限制；超时缓冲从 5s 放宽到 15s；处理异常不再把原始报错回传给用户；移除 customVoice 的无效顶层字段。
+- **1.2.0** — 同步 OpenRouter speech 模型目录（2026-07-22）：移除已下架的 OpenAI `gpt-4o-mini-tts`；新增 Deepgram Aura-2（90 音色）、MiniMax Speech 2.8 HD / Turbo（自定义音色）。
+- **1.1.0** — 接入 OpenRouter 全部 speech-output 模型，每个模型独立音色菜单；按返回音频 magic bytes 自动识别格式。
+- **1.0.1** — 区分 Gemini TTS 与 OpenAI TTS 的 voice 选择，增加自定义 voice。
 
 ## License
 

@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.2.1",
+      "desc": "深度代码检查修复：未填音色时明确报错（custom/MiniMax 不再回退 Kore）；PCM 采样率可配置（新增 PCM Sample Rate 选项）；pluginValidate 使用用户配置的格式；RIFF 嗅探校验 WAVE；缓存增加 30 分钟 TTL；收紧 csm 匹配；instructions 计入长度限制；放宽超时缓冲；错误信息不再泄漏异常原文",
+      "sha256": "acab3c8348ab145254228d4a2365e6433f4ff168bf910c6ba89dfab13782a8ca",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.2.1/openrouter-tts-1.2.1.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1784650440063
+    },
+    {
       "version": "1.2.0",
       "desc": "同步 OpenRouter speech 模型目录（2026-07-22）：移除已下架的 OpenAI gpt-4o-mini-tts；新增 Deepgram Aura-2（90 音色）、MiniMax Speech 2.8 HD / Turbo（自定义音色）",
       "sha256": "8478d5a7afbda2f0d91b46c8e0e9e000c65e0179a8cb77f55b810a43ae4c401e",
