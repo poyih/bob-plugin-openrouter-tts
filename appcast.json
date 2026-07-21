@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.2.0",
+      "desc": "同步 OpenRouter speech 模型目录（2026-07-22）：移除已下架的 OpenAI gpt-4o-mini-tts；新增 Deepgram Aura-2（90 音色）、MiniMax Speech 2.8 HD / Turbo（自定义音色）",
+      "sha256": "8478d5a7afbda2f0d91b46c8e0e9e000c65e0179a8cb77f55b810a43ae4c401e",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.2.0/openrouter-tts-1.2.0.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1784646900600
+    },
+    {
       "version": "1.1.0",
       "desc": "接入 OpenRouter 全部 speech-output 模型（10 个），每个模型独立音色菜单；按返回音频 magic bytes 自动识别 WAV/MP3/Ogg/FLAC，Speed 仅在非 1.0x 时发送",
       "sha256": "f31ddcb3ec29bbf4358571b45382a13c40d2dbe68a0bc70a7e91fa677fe563f1",

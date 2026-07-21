@@ -14,7 +14,6 @@
 | 模型 | OpenRouter ID | 对应 Voice 菜单 | 音色数 |
 | --- | --- | --- | --- |
 | Gemini 3.1 Flash TTS Preview | `google/gemini-3.1-flash-tts-preview` | Voice · Gemini | 30 |
-| GPT-4o Mini TTS | `openai/gpt-4o-mini-tts-2025-12-15` | Voice · OpenAI | 13 |
 | MAI-Voice-2 | `microsoft/mai-voice-2` | Voice · Microsoft MAI | 4 |
 | Grok Voice TTS 1.0 | `x-ai/grok-voice-tts-1.0` | Voice · Grok | 5 |
 | Zonos v0.1 Transformer | `zyphra/zonos-v0.1-transformer` | Voice · Zyphra Zonos | 5 |
@@ -23,9 +22,12 @@
 | Orpheus 3B | `canopylabs/orpheus-3b-0.1-ft` | Voice · Orpheus | 7 |
 | Kokoro 82M | `hexgrad/kokoro-82m` | Voice · Kokoro | 54 |
 | Voxtral Mini TTS | `mistralai/voxtral-mini-tts-2603` | Voice · Voxtral | 30 |
+| Aura-2 | `deepgram/aura-2` | Voice · Deepgram Aura-2 | 90 |
+| Speech 2.8 HD | `minimax/speech-2.8-hd` | Custom Voice | — |
+| Speech 2.8 Turbo | `minimax/speech-2.8-turbo` | Custom Voice | — |
 | 自定义模型 | `Custom Model ID` 填写 | Custom Voice | — |
 
-> 模型列表对应 OpenRouter [output_modalities=speech](https://openrouter.ai/models?output_modalities=speech) 的全部模型。新增模型可直接在 `Custom Model ID` 中填写 ID，并在 `Custom Voice` 里填对应音色。
+> 模型列表对应 OpenRouter [output_modalities=speech](https://openrouter.ai/models?output_modalities=speech) 的全部 12 个模型（2026-07-22 核对）。OpenAI `gpt-4o-mini-tts` 已从 OpenRouter 下架，故移除。MiniMax 两个模型接受任意音色 ID，请在 `Custom Voice` 中填写。新增模型可直接在 `Custom Model ID` 中填写 ID，并在 `Custom Voice` 里填对应音色。
 
 ## 配置
 
@@ -50,7 +52,6 @@
 | 家族 | 匹配规则 | 使用的配置项 |
 | --- | --- | --- |
 | Gemini | 含 `gemini` | Voice · Gemini |
-| OpenAI | `openai/` 开头、含 `gpt-4o-mini-tts`、`tts-1` 开头 | Voice · OpenAI |
 | Microsoft | `microsoft/` 开头、含 `mai-voice` | Voice · Microsoft MAI |
 | xAI Grok | `x-ai/` 开头、含 `grok-voice` | Voice · Grok |
 | Zyphra | `zyphra/` 开头、含 `zonos` | Voice · Zyphra Zonos |
@@ -58,6 +59,8 @@
 | Canopy Orpheus | `canopylabs/` 开头、含 `orpheus` | Voice · Orpheus |
 | Kokoro | `hexgrad/` 开头、含 `kokoro` | Voice · Kokoro |
 | Voxtral | `mistralai/` 开头、含 `voxtral` | Voice · Voxtral |
+| Deepgram | `deepgram/` 开头、含 `aura-2` | Voice · Deepgram Aura-2 |
+| MiniMax | `minimax/` 开头、含 `speech-2.8` | Custom Voice（无预设菜单，需手动填写音色 ID） |
 | 其他自定义 | 未匹配到上述任一家族 | Custom Voice，为空时回退到 Gemini 默认音色 |
 
 ## OpenRouter 配置示例
@@ -79,13 +82,21 @@
 | **Voice · Kokoro** | `af_heart`、`zf_xiaoxiao`（中文）、`jf_alpha`（日语）等 |
 | **Audio Format** | `pcm` 或 `mp3` |
 
-### OpenAI GPT-4o Mini TTS
+### Deepgram Aura-2（多语言、低延迟）
 
 | 选项 | 值 |
 | --- | --- |
-| **Model** | `openai/gpt-4o-mini-tts-2025-12-15` |
-| **Voice · OpenAI** | `marin`、`cedar`、`alloy` 等 |
-| **Audio Format** | `mp3` 或 provider 支持的格式 |
+| **Model** | `deepgram/aura-2` |
+| **Voice · Deepgram Aura-2** | `aura-2-thalia-en`、`aura-2-zeus-en`、`aura-2-ama-ja`（日语）等 |
+| **Audio Format** | `mp3` 或 `pcm` |
+
+### MiniMax Speech 2.8（自定义音色）
+
+| 选项 | 值 |
+| --- | --- |
+| **Model** | `minimax/speech-2.8-hd` 或 `minimax/speech-2.8-turbo` |
+| **Custom Voice** | 填写 MiniMax 音色 ID（模型接受任意音色 ID，无预设菜单） |
+| **Audio Format** | `mp3` 或 `pcm` |
 
 `API URL` 也支持填写：
 
@@ -127,7 +138,7 @@
 
 自动、中文（简/繁）、英语、日语、韩语、法语、德语、西班牙语、意大利语、葡萄牙语、俄语、阿拉伯语、泰语、越南语、印尼语、马来语、土耳其语、波兰语、荷兰语、瑞典语、丹麦语、挪威语、芬兰语、希腊语、捷克语、罗马尼亚语、匈牙利语、斯洛伐克语、乌克兰语、保加利亚语、克罗地亚语、印地语、孟加拉语、泰米尔语、泰卢固语、马拉雅拉姆语、希伯来语、菲律宾语。
 
-> 各模型实际支持的语言不同（例如 Kokoro / MAI-Voice-2 / Voxtral 为多语言，Zonos / Orpheus 主要为英语），请按所选模型挑选合适的音色。
+> 各模型实际支持的语言不同（例如 Kokoro / MAI-Voice-2 / Voxtral / Deepgram Aura-2 为多语言，Zonos / Orpheus 主要为英语），请按所选模型挑选合适的音色。
 
 ## 开发
 

@@ -11,25 +11,25 @@ var DEFAULT_API_URL = 'https://openrouter.ai/api/v1/audio/speech';
 var DEFAULT_MODEL = 'google/gemini-3.1-flash-tts-preview';
 var VOICE_OPTION_BY_FAMILY = {
     gemini: 'voiceGemini',
-    openai: 'voiceOpenAI',
     microsoft: 'voiceMicrosoft',
     grok: 'voiceGrok',
     zyphra: 'voiceZyphra',
     sesame: 'voiceSesame',
     orpheus: 'voiceOrpheus',
     kokoro: 'voiceKokoro',
-    voxtral: 'voiceVoxtral'
+    voxtral: 'voiceVoxtral',
+    deepgram: 'voiceDeepgram'
 };
 var DEFAULT_VOICE_BY_FAMILY = {
     gemini: 'Kore',
-    openai: 'marin',
     microsoft: 'en-US-Harper:MAI-Voice-2',
     grok: 'eve',
     zyphra: 'american_female',
     sesame: 'conversational_a',
     orpheus: 'tara',
     kokoro: 'af_heart',
-    voxtral: 'en_paul_neutral'
+    voxtral: 'en_paul_neutral',
+    deepgram: 'aura-2-thalia-en'
 };
 var AUDIO_CACHE = {};
 var AUDIO_CACHE_ORDER = [];
@@ -104,11 +104,6 @@ function getModelFamily(model) {
     if (value.indexOf('gemini') !== -1) {
         return 'gemini';
     }
-    if (value.indexOf('openai/') === 0 ||
-        value.indexOf('gpt-4o-mini-tts') !== -1 ||
-        value.indexOf('tts-1') === 0) {
-        return 'openai';
-    }
     if (value.indexOf('microsoft/') === 0 || value.indexOf('mai-voice') !== -1) {
         return 'microsoft';
     }
@@ -130,6 +125,12 @@ function getModelFamily(model) {
     if (value.indexOf('mistralai/') === 0 || value.indexOf('voxtral') !== -1) {
         return 'voxtral';
     }
+    if (value.indexOf('deepgram/') === 0 || value.indexOf('aura-2') !== -1) {
+        return 'deepgram';
+    }
+    if (value.indexOf('minimax/') === 0 || value.indexOf('speech-2.8') !== -1) {
+        return 'minimax';
+    }
 
     return 'custom';
 }
@@ -137,6 +138,10 @@ function getModelFamily(model) {
 function getVoice() {
     var family = getModelFamily(getModel());
     var customVoice = readOption('customVoice');
+
+    if (family === 'minimax') {
+        return customVoice;
+    }
 
     if (family === 'custom') {
         return customVoice || readOption('voiceGemini') || DEFAULT_VOICE_BY_FAMILY.gemini;
