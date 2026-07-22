@@ -1,6 +1,6 @@
 {
   "identifier": "bob-plugin-openrouter-tts",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "category": "tts",
   "name": "OpenRouter TTS",
   "summary": "使用 OpenRouter TTS API 进行语音合成，覆盖全部 speech-output 模型。",
@@ -25,7 +25,7 @@
       "type": "text",
       "title": "API URL",
       "defaultValue": "https://openrouter.ai/api/v1/audio/speech",
-      "desc": "OpenRouter TTS 接口地址。支持填写 https://openrouter.ai、https://openrouter.ai/api、https://openrouter.ai/api/v1、完整 /audio/speech 地址，或 legacy/custom /tts 地址。",
+      "desc": "OpenRouter TTS 接口地址。远程地址必须使用 HTTPS；仅 localhost、127/8、[::1] 可使用 HTTP 调试。支持基础地址、完整 /audio/speech、legacy/custom /tts，并保留 query 参数。",
       "textConfig": {
         "type": "visible",
         "placeholderText": "https://openrouter.ai/api/v1/audio/speech"
@@ -36,7 +36,7 @@
       "type": "menu",
       "title": "Model",
       "defaultValue": "google/gemini-3.1-flash-tts-preview",
-      "desc": "OpenRouter speech-output 模型。选中某个模型后，请在下方对应的 Voice 菜单里挑选音色；MiniMax 模型请在 Custom Voice 填写音色 ID。",
+      "desc": "OpenRouter speech-output 模型。通常使用下方对应的 Voice 菜单；Custom Voice 非空时会全局覆盖菜单音色。MiniMax 模型请在 Custom Voice 填写音色 ID。",
       "menuValues": [
         {
           "title": "Gemini 3.1 Flash TTS Preview (Google)",
@@ -1117,7 +1117,7 @@
       "type": "text",
       "title": "Custom Voice",
       "defaultValue": "",
-      "desc": "可选。用于无法自动识别音色家族的自定义模型，以及 MiniMax（speech-2.8-hd / turbo，接受任意音色 ID）；填写后会覆盖该模型的默认音色。",
+      "desc": "可用于任意模型。非空时优先并覆盖对应的 Voice 菜单；清空后恢复菜单音色。MiniMax 与无法识别家族的自定义模型必须填写。",
       "textConfig": {
         "type": "visible",
         "placeholderText": "填写自定义 voice ID（MiniMax 也可）"
@@ -1128,10 +1128,10 @@
       "type": "menu",
       "title": "Audio Format",
       "defaultValue": "pcm",
-      "desc": "pcm 会被包装成 WAV 给 Bob 播放；其余格式需 provider 支持，插件会按返回的实际音频自动识别。",
+      "desc": "裸 PCM 会被包装成 WAV；其余格式需 provider 支持。插件优先依据响应 MIME，再用严格 magic bytes 识别；明确 PCM 时不采用 MP3 嗅探，JSON/文本不会被当作音频。",
       "menuValues": [
         {
-          "title": "PCM 24k (wrap to WAV)",
+          "title": "PCM (wrap to WAV; default 24k)",
           "value": "pcm"
         },
         {
@@ -1157,7 +1157,7 @@
       "type": "menu",
       "title": "PCM Sample Rate",
       "defaultValue": "24000",
-      "desc": "仅在 Audio Format 为 pcm（包装成 WAV）时生效。绝大多数 OpenRouter provider 的 PCM 为 24kHz；若某 provider 返回其他采样率导致播放变速，可在此调整。",
+      "desc": "返回内容按裸 PCM 包装成 WAV 时生效（通常 Audio Format 为 pcm）。默认 24kHz；若 provider 返回其他采样率导致播放变速，可在此调整。",
       "menuValues": [
         {
           "title": "8 kHz",

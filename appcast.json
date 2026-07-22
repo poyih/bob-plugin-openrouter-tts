@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.2.2",
+      "desc": "深度代码检查与安全加固：严格区分 inline audio、MIME、JSON 与二进制响应；以流式累计实施 64 MiB 上限并优化原生 WAV 包装；缓存键纳入 API Key 作用域与 PCM 采样率；Custom Voice 可覆盖所有模型家族；远程自定义接口强制 HTTPS；修正 URL query/fragment 与 pt-br；强化 MP3 帧校验；新增 26 项回归测试",
+      "sha256": "effde56f241232f2717402e11d30c55c17e3999f889172d208b1ae7d1f72743d",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.2.2/openrouter-tts-1.2.2.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1784703331000
+    },
+    {
       "version": "1.2.1",
       "desc": "深度代码检查修复：未填音色时明确报错（custom/MiniMax 不再回退 Kore）；PCM 采样率可配置（新增 PCM Sample Rate 选项）；pluginValidate 使用用户配置的格式；RIFF 嗅探校验 WAVE；缓存增加 30 分钟 TTL；收紧 csm 匹配；instructions 计入长度限制；放宽超时缓冲；错误信息不再泄漏异常原文",
       "sha256": "acab3c8348ab145254228d4a2365e6433f4ff168bf910c6ba89dfab13782a8ca",
