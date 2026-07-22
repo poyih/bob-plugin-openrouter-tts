@@ -17,7 +17,9 @@ class MockData {
     }
 
     get length() {
-        return this.hooks.length == null ? this.bytes.byteLength : this.hooks.length;
+        return Object.prototype.hasOwnProperty.call(this.hooks, 'length')
+            ? this.hooks.length
+            : this.bytes.byteLength;
     }
 
     appendData(other) {
@@ -244,6 +246,15 @@ function callTts(plugin, query) {
     return output;
 }
 
+function callPluginValidate(plugin) {
+    let output;
+    plugin.context.pluginValidate((value) => {
+        output = value;
+    });
+    assert.ok(output, 'pluginValidate completion should be called synchronously by the mock');
+    return output;
+}
+
 function wavSampleRate(base64) {
     return Buffer.from(base64, 'base64').readUInt32LE(24);
 }
@@ -461,6 +472,23 @@ test('rejects truncated odd-length 16-bit PCM', () => {
     );
 });
 
+test('plugin validation exercises the complete audio conversion path', () => {
+    const valid = createFallbackPlugin(options(), () => ({
+        rawData: new MockData([1, 2, 3, 4], { length: undefined }),
+        response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    assert.equal(callPluginValidate(valid).result, true);
+
+    const truncated = createFallbackPlugin(options(), () => ({
+        rawData: new MockData([1], { length: undefined }),
+        response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    const result = callPluginValidate(truncated);
+    assert.equal(result.result, false);
+    assert.match(result.error.message, /音频响应处理失败/);
+    assert.ok(truncated.state.errorLogs.some((message) => message.includes('response_processing_error')));
+});
+
 test('rejects malformed inline data and explicitly non-audio MIME types', () => {
     let rawBase64Calls = 0;
     const plugin = createFallbackPlugin(options(), () => ({
@@ -654,6 +682,39 @@ test('streaming path aggregates chunks and accepts the exact size boundary', () 
         Array.from(Buffer.from(result.result.value, 'base64').subarray(44)),
         [1, 2, 3, 4]
     );
+});
+
+test('streaming path accepts native-bridged numeric data lengths', () => {
+    for (const bridgedLength of [Object(4), '4', undefined]) {
+        const plugin = createFallbackPlugin(options(), () => ({
+            rawData: new MockData([1, 2, 3, 4], { length: bridgedLength }),
+            response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        }));
+
+        const result = callTts(plugin);
+        assert.equal(plugin.state.signals[0].sendCount, 0);
+        assert.equal(result.result.raw.format, 'wav');
+        assert.deepEqual(
+            Array.from(Buffer.from(result.result.value, 'base64').subarray(44)),
+            [1, 2, 3, 4]
+        );
+    }
+});
+
+test('known streamed length avoids repeatedly encoding lengthless Bob data', () => {
+    let rawBase64Calls = 0;
+    const plugin = createFallbackPlugin(options(), () => ({}));
+    const rawData = new MockData([1, 2, 3, 4], {
+        length: undefined,
+        onBase64() { rawBase64Calls += 1; }
+    });
+
+    assert.equal(plugin.context.getDataLength(rawData), 4);
+    assert.equal(rawBase64Calls, 1);
+
+    const result = plugin.context.processAudioData(rawData, 'pcm', 'audio/pcm', 24000, 4);
+    assert.equal(result.outputFormat, 'wav');
+    assert.equal(rawBase64Calls, 1, 'known length should prevent another raw-data base64 conversion');
 });
 
 test('streaming path cancels cumulative overflow and completes only once', () => {

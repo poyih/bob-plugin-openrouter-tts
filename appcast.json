@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.2.4",
+      "desc": "修复 Bob 1.20 流式 $data 不暴露 length / byteLength 时音频响应被误判为无效；兼容原生桥接数值长度，并复用已知字节数完成 JSON 识别、格式嗅探和 PCM→WAV 包装；插件验证现覆盖完整音频转换路径，新增 3 项回归测试",
+      "sha256": "3e9fa677c291b067ac837844ea6cf4abed5fdb8fe10b5cc8b06a5b9f73fde7d1",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.2.4/openrouter-tts-1.2.4.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1784706962000
+    },
+    {
       "version": "1.2.2",
       "desc": "深度代码检查与安全加固：严格区分 inline audio、MIME、JSON 与二进制响应；以流式累计实施 64 MiB 上限并优化原生 WAV 包装；缓存键纳入 API Key 作用域与 PCM 采样率；Custom Voice 可覆盖所有模型家族；远程自定义接口强制 HTTPS；修正 URL query/fragment 与 pt-br；强化 MP3 帧校验；新增 26 项回归测试",
       "sha256": "effde56f241232f2717402e11d30c55c17e3999f889172d208b1ae7d1f72743d",

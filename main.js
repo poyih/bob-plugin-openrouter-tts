@@ -821,12 +821,13 @@ function canUseNativeDataAudioProcessing() {
         typeof $data.fromBase64 === 'function';
 }
 
-function pcmDataToWavBase64(pcmData, sampleRate) {
-    if (!canUseNativeDataAudioProcessing() || !pcmData || typeof pcmData.length !== 'number') {
+function pcmDataToWavBase64(pcmData, sampleRate, knownLength) {
+    var pcmLength = getDataLength(pcmData, knownLength);
+    if (!canUseNativeDataAudioProcessing() || pcmLength < 0) {
         return '';
     }
 
-    var headerBytes = createWavHeaderBytes(pcmData.length, sampleRate);
+    var headerBytes = createWavHeaderBytes(pcmLength, sampleRate);
     var headerArray = [];
     for (var i = 0; i < headerBytes.length; i++) {
         headerArray.push(headerBytes[i]);
@@ -843,8 +844,9 @@ function pcmBase64ToWavNative(base64, sampleRate) {
     try {
         var str = String(base64 || '');
         var start = getBase64PayloadStart(str);
-        var pcmData = $data.fromBase64(start ? str.substring(start) : str);
-        return pcmDataToWavBase64(pcmData, sampleRate);
+        var payload = start ? str.substring(start) : str;
+        var pcmData = $data.fromBase64(payload);
+        return pcmDataToWavBase64(pcmData, sampleRate, base64DecodedByteLength(payload));
     } catch (e) {
         return '';
     }
@@ -1028,6 +1030,74 @@ function isBobDataObject(value) {
     }
 }
 
+function getDataLength(data, knownLength) {
+    if (!data) {
+        return -1;
+    }
+
+    var length;
+    try {
+        length = Number(knownLength);
+        if (isFinite(length) && length >= 0 && Math.floor(length) === length) {
+            return length;
+        }
+
+        // JavaScriptCore may expose the native NSUInteger as a boxed value
+        // instead of a primitive JavaScript number.
+        length = Number(data.length);
+    } catch (e) {
+        length = -1;
+    }
+
+    if (isFinite(length) && length >= 0 && Math.floor(length) === length) {
+        return length;
+    }
+
+    // Bob 1.20 stream chunks are valid $data objects but expose no length
+    // property. Base64 is the only bounded representation that reports the
+    // byte count without expanding every byte into a JavaScript number array.
+    if (typeof data.toBase64 === 'function') {
+        try {
+            var base64 = data.toBase64();
+            if (typeof base64 === 'string') {
+                return base64DecodedByteLength(base64);
+            }
+        } catch (e) {
+            return -1;
+        }
+    }
+    return -1;
+}
+
+function describeDataShape(data) {
+    if (!data) {
+        return 'data=null';
+    }
+
+    var lengthValue = '';
+    var byteLengthValue = '';
+    try {
+        lengthValue = String(data.length);
+    } catch (e) {
+        lengthValue = '[throws]';
+    }
+    try {
+        byteLengthValue = String(data.byteLength);
+    } catch (e) {
+        byteLengthValue = '[throws]';
+    }
+
+    return 'data_type=' + typeof data +
+        ' is_data=' + isBobDataObject(data) +
+        ' length_type=' + typeof data.length +
+        ' length=' + sanitizeLogValue(lengthValue) +
+        ' byte_length_type=' + typeof data.byteLength +
+        ' byte_length=' + sanitizeLogValue(byteLengthValue) +
+        ' to_base64=' + typeof data.toBase64 +
+        ' to_byte_array=' + typeof data.toByteArray +
+        ' read_uint8=' + typeof data.readUInt8;
+}
+
 function hasParsedNonAudioData(resp) {
     var data = resp && resp.data;
     if (data === null || typeof data === 'undefined' || isBobDataObject(data)) {
@@ -1036,12 +1106,15 @@ function hasParsedNonAudioData(resp) {
     return typeof data === 'object' || typeof data === 'number' || typeof data === 'boolean';
 }
 
-function parsePossibleJsonData(rawData) {
+function parsePossibleJsonData(rawData, knownLength) {
     if (!rawData || typeof rawData.readUInt8 !== 'function' || typeof rawData.toUTF8 !== 'function') {
         return { matched: false };
     }
 
-    var length = typeof rawData.length === 'number' ? rawData.length : 0;
+    var length = getDataLength(rawData, knownLength);
+    if (length < 0) {
+        return { matched: false };
+    }
     var index = 0;
     if (length >= 3 && rawData.readUInt8(0) === 0xEF &&
         rawData.readUInt8(1) === 0xBB && rawData.readUInt8(2) === 0xBF) {
@@ -1118,14 +1191,15 @@ function getAudioPayload(resp) {
     if (!rawData || typeof rawData.toBase64 !== 'function') {
         return null;
     }
-    if (typeof rawData.length !== 'number' || !isFinite(rawData.length) || rawData.length <= 0) {
+    var rawDataLength = getDataLength(rawData, resp && resp.rawDataLength);
+    if (rawDataLength <= 0) {
         return null;
     }
-    if (rawData.length > MAX_AUDIO_BYTES) {
+    if (rawDataLength > MAX_AUDIO_BYTES) {
         return { tooLarge: true };
     }
 
-    var parsedJson = parsePossibleJsonData(rawData);
+    var parsedJson = parsePossibleJsonData(rawData, rawDataLength);
     if (parsedJson.matched) {
         var parsedInlineAudio = getInlineAudioData({ data: parsedJson.data });
         if (!parsedInlineAudio) {
@@ -1149,12 +1223,13 @@ function getAudioPayload(resp) {
 
     return {
         rawData: rawData,
+        byteLength: rawDataLength,
         mimeType: mimeType,
         source: 'raw'
     };
 }
 
-function parseStreamedResponseData(rawData, response) {
+function parseStreamedResponseData(rawData, response, rawDataLength) {
     if (!rawData || typeof rawData.toUTF8 !== 'function') {
         return null;
     }
@@ -1163,7 +1238,7 @@ function parseStreamedResponseData(rawData, response) {
     var mimeType = getResponseMimeType({ response: response });
     var isSuccessful = !statusCode || (statusCode >= 200 && statusCode < 300);
     if (isSuccessful) {
-        var successfulJson = parsePossibleJsonData(rawData);
+        var successfulJson = parsePossibleJsonData(rawData, rawDataLength);
         if (successfulJson.matched) {
             return successfulJson.data;
         }
@@ -1172,7 +1247,7 @@ function parseStreamedResponseData(rawData, response) {
         }
     }
 
-    var parsedJson = parsePossibleJsonData(rawData);
+    var parsedJson = parsePossibleJsonData(rawData, rawDataLength);
     if (parsedJson.matched) {
         return parsedJson.data;
     }
@@ -1258,9 +1333,9 @@ function requestSpeechResponse(request, handler) {
                     if (!chunk) {
                         return;
                     }
-                    var chunkLength = chunk.length;
-                    if (typeof chunkLength !== 'number' || !isFinite(chunkLength) || chunkLength < 0) {
-                        throw new Error('流数据长度无效');
+                    var chunkLength = getDataLength(chunk);
+                    if (chunkLength < 0) {
+                        throw new Error('流数据长度无效 ' + describeDataShape(chunk));
                     }
                     if (chunkLength === 0) {
                         return;
@@ -1307,12 +1382,17 @@ function requestSpeechResponse(request, handler) {
                     error: resp.error,
                     response: resp.response,
                     rawData: accumulatedData,
+                    rawDataLength: accumulatedLength,
                     audioTooLarge: contentTooLarge,
                     streamProcessingError: streamProcessingError
                 };
                 if (!contentTooLarge) {
                     try {
-                        normalized.data = parseStreamedResponseData(accumulatedData, normalized.response);
+                        normalized.data = parseStreamedResponseData(
+                            accumulatedData,
+                            normalized.response,
+                            normalized.rawDataLength
+                        );
                     } catch (e) {
                         normalized.streamProcessingError = e;
                     }
@@ -1511,11 +1591,12 @@ function processAudioBase64(audioBase64, format, mimeType, sampleRate) {
     return { value: audioBase64, outputFormat: format || 'audio' };
 }
 
-function readDataPrefix(data, byteCount) {
-    if (!data || typeof data.readUInt8 !== 'function' || typeof data.length !== 'number') {
+function readDataPrefix(data, byteCount, knownLength) {
+    var dataLength = getDataLength(data, knownLength);
+    if (!data || typeof data.readUInt8 !== 'function' || dataLength < 0) {
         return new Uint8Array(0);
     }
-    var length = Math.min(data.length, byteCount);
+    var length = Math.min(dataLength, byteCount);
     var bytes = new Uint8Array(length);
     for (var i = 0; i < length; i++) {
         bytes[i] = data.readUInt8(i);
@@ -1523,7 +1604,7 @@ function readDataPrefix(data, byteCount) {
     return bytes;
 }
 
-function processAudioData(rawData, format, mimeType, sampleRate) {
+function processAudioData(rawData, format, mimeType, sampleRate, knownLength) {
     var lowerMimeType = String(mimeType || '').toLowerCase();
     var shouldTreatAsPcm = String(format || '').toLowerCase() === 'pcm' ||
         lowerMimeType.indexOf('pcm') !== -1 ||
@@ -1533,16 +1614,20 @@ function processAudioData(rawData, format, mimeType, sampleRate) {
         return { value: rawData.toBase64(), outputFormat: declaredContainer };
     }
 
-    var sniffedContainer = sniffAudioContainer(readDataPrefix(rawData, 4096));
+    var sniffedContainer = sniffAudioContainer(readDataPrefix(rawData, 4096, knownLength));
     if (sniffedContainer && !(shouldTreatAsPcm && sniffedContainer === 'mp3')) {
         return { value: rawData.toBase64(), outputFormat: sniffedContainer };
     }
 
     if (shouldTreatAsPcm) {
-        if (rawData.length % 2 !== 0) {
+        var rawDataLength = getDataLength(rawData, knownLength);
+        if (rawDataLength < 0) {
+            throw new Error('音频数据长度无效');
+        }
+        if (rawDataLength % 2 !== 0) {
             throw new Error('16-bit PCM 音频字节数必须为偶数');
         }
-        var nativeWavBase64 = pcmDataToWavBase64(rawData, sampleRate);
+        var nativeWavBase64 = pcmDataToWavBase64(rawData, sampleRate, rawDataLength);
         if (nativeWavBase64) {
             return { value: nativeWavBase64, outputFormat: 'wav' };
         }
@@ -1554,7 +1639,7 @@ function processAudioData(rawData, format, mimeType, sampleRate) {
 
 function processAudioPayload(payload, format, sampleRate) {
     if (payload && payload.rawData) {
-        return processAudioData(payload.rawData, format, payload.mimeType, sampleRate);
+        return processAudioData(payload.rawData, format, payload.mimeType, sampleRate, payload.byteLength);
     }
     return processAudioBase64(payload ? payload.data : '', format, payload ? payload.mimeType : '', sampleRate);
 }
@@ -1584,6 +1669,8 @@ function pluginValidate(completion) {
     var model = getModel();
     var voice = getVoice();
     var apiUrl = getApiUrl();
+    var format = getResponseFormat();
+    var sampleRate = getSampleRate();
 
     requestSpeechResponse({
         method: 'POST',
@@ -1592,7 +1679,7 @@ function pluginValidate(completion) {
             Authorization: 'Bearer ' + apiKey,
             'Content-Type': 'application/json'
         },
-        body: buildSpeechRequestBody('Hi', model, voice, getResponseFormat(), 1.0),
+        body: buildSpeechRequestBody('Hi', model, voice, format, 1.0),
         timeout: VALIDATION_TIMEOUT_INTERVAL
     }, function(resp) {
         if (resp.streamUnsupported) {
@@ -1604,6 +1691,9 @@ function pluginValidate(completion) {
             return;
         }
         if (resp.streamProcessingError) {
+            logError('[validate] stream_processing_error message=' + sanitizeLogValue(
+                resp.streamProcessingError.message || resp.streamProcessingError
+            ));
             completion({ result: false, error: { type: 'api', message: '音频响应处理失败。' } });
             return;
         }
@@ -1628,7 +1718,13 @@ function pluginValidate(completion) {
                 completion({ result: false, error: { type: 'api', message: 'OpenRouter TTS 服务没有返回音频数据。' } });
                 return;
             }
+            var processed = processAudioPayload(payload, format, sampleRate);
+            payload.rawData = null;
+            if (!processed || !processed.value) {
+                throw new Error('音频转换结果为空');
+            }
         } catch (e) {
+            logError('[validate] response_processing_error message=' + sanitizeLogValue(e.message || e));
             completion({ result: false, error: { type: 'api', message: '音频响应处理失败。' } });
             return;
         }
@@ -1785,7 +1881,7 @@ function tts(query, completion) {
 
                 var convertStartedAt = nowMs();
                 var sourceSizeLog = audioPayload.rawData
-                    ? ' source_bytes=' + audioPayload.rawData.length
+                    ? ' source_bytes=' + getDataLength(audioPayload.rawData, audioPayload.byteLength)
                     : ' source_base64_chars=' + audioPayload.data.length;
                 var processed = processAudioPayload(audioPayload, format, sampleRate);
                 audioPayload.rawData = null;

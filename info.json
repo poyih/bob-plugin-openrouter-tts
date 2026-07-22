@@ -1,6 +1,6 @@
 {
   "identifier": "bob-plugin-openrouter-tts",
-  "version": "1.2.2",
+  "version": "1.2.4",
   "category": "tts",
   "name": "OpenRouter TTS",
   "summary": "使用 OpenRouter TTS API 进行语音合成，覆盖全部 speech-output 模型。",

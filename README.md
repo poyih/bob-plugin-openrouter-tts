@@ -166,6 +166,8 @@ npm test
 
 ## Changelog
 
+- **1.2.4** — 修复 Bob 1.20 的流式 `$data` 对象不暴露 `length` / `byteLength` 时正常音频被误判为长度无效；以单次分块 base64 计算字节数，并在后续 JSON 识别、格式嗅探和 WAV 包装中复用已知长度。
+- **1.2.3** — 兼容 JavaScriptCore 将 `$data.length` 以原生桥接数值而非普通 JavaScript `number` 暴露的情况。
 - **1.2.2** — 修正 JSON / rawData / MIME 音频判别；PCM 采样率与 API Key 作用域纳入 SHA-256 缓存键，并主动清理过期缓存；Custom Voice 可覆盖所有模型家族；远程自定义接口强制 HTTPS（loopback 调试除外）；API URL 补路径时正确保留 query / fragment；修正 Bob 巴西葡萄牙语代码为 `pt-br`；以流式累计实现 64 MiB 响应上限，移除不安全的完整缓冲回退，并用 Bob 原生二进制数据低内存包装 WAV；MP3 裸帧需连续有效帧才判定，且明确 PCM 时不采用 MP3 嗅探，避免误报。
 - **1.2.1** — 深度代码检查修复：custom/MiniMax 家族未填音色时明确报错（不再静默回退 Gemini 音色 Kore）；`pcmToWav` 采样率可配置（新增 PCM Sample Rate 选项，默认 24kHz）；`pluginValidate` 使用用户配置的格式而非硬编码 pcm；RIFF 嗅探额外校验 WAVE 标识；音频缓存增加 30 分钟 TTL；收紧 `csm` 子串匹配避免误判；`instructions` 计入 4096 字符长度限制；超时缓冲从 5s 放宽到 15s；处理异常不再把原始报错回传给用户；移除 customVoice 的无效顶层字段。
 - **1.2.0** — 同步 OpenRouter speech 模型目录（2026-07-22）：移除已下架的 OpenAI `gpt-4o-mini-tts`；新增 Deepgram Aura-2（90 音色）、MiniMax Speech 2.8 HD / Turbo（自定义音色）。
