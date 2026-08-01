@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.3.2",
+      "desc": "PCM Sample Rate 新增 Auto 默认档，按模型家族选择包装采样率（Fish Audio 44.1kHz、其他 24kHz），修复 Fish Audio 在 pcm 格式下声音低沉拖沓；显式选择采样率的行为不变",
+      "sha256": "1569b27297b71a2a7e58b8a31ea3bddb3c5aafad736dbe8299103b29948a70d4",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.3.2/openrouter-tts-1.3.2.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1785560524226
+    },
+    {
       "version": "1.3.1",
       "desc": "新增 Voice · Fish Audio 菜单：收录 fish.audio 社区音色 AD学姐、女大学生（reference ID），并提供默认音色选项（不发送 voice）；Custom Voice 仍可填任意 reference ID 覆盖",
       "sha256": "5db3fa55bfe24593767640671bdeaf26c8e6d5d1169831b410ec3c715eeb047b",

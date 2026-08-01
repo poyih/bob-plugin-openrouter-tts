@@ -457,6 +457,33 @@ test('Qwen flash and plus use separate voice menus with their own defaults', () 
     assert.equal(plus.state.requests[0].body.voice, 'longanlufeng');
 });
 
+test('auto PCM sample rate follows the model family', () => {
+    const pcm = Buffer.from([1, 2, 3, 4]);
+    const fish = createFallbackPlugin(
+        options({ model: 'fish-audio/s1', pcmSampleRate: 'auto' }),
+        () => ({
+            rawData: new MockData(pcm),
+            response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        })
+    );
+    assert.equal(wavSampleRate(callTts(fish).result.value), 44100);
+
+    const gemini = createFallbackPlugin(options({ pcmSampleRate: 'auto' }), () => ({
+        rawData: new MockData(pcm),
+        response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    assert.equal(wavSampleRate(callTts(gemini).result.value), 24000);
+
+    const fishExplicit = createFallbackPlugin(
+        options({ model: 'fish-audio/s1', pcmSampleRate: '24000' }),
+        () => ({
+            rawData: new MockData(pcm),
+            response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        })
+    );
+    assert.equal(wavSampleRate(callTts(fishExplicit).result.value), 24000);
+});
+
 test('MiniMax still requires Custom Voice while Fish Audio does not', () => {
     const minimax = createFallbackPlugin(options({ model: 'minimax/speech-2.8-hd' }), () => ({}));
     const result = callTts(minimax);

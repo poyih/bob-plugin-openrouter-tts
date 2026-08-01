@@ -200,9 +200,18 @@ function getSpeed() {
     return isNaN(speed) ? 1.0 : speed;
 }
 
+// 裸 PCM 包装 WAV 时各家族的实际输出采样率；未列出的家族按 24 kHz。
+var PCM_SAMPLE_RATE_BY_FAMILY = {
+    fishaudio: 44100
+};
+
 function getSampleRate() {
     var rate = parseInt(readOption('pcmSampleRate'), 10);
-    return rate > 0 ? rate : 24000;
+    if (rate > 0) {
+        return rate;
+    }
+    var family = getModelFamily(getModel());
+    return PCM_SAMPLE_RATE_BY_FAMILY[family] || 24000;
 }
 
 function isOpenRouterBaseUrl(base) {

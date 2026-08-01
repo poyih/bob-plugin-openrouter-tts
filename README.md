@@ -49,7 +49,7 @@
 | **Voice · 各家族** | 各模型家族的音色菜单，详见上表 |
 | **Custom Voice** | 可用于任意模型；非空时优先并覆盖对应的 Voice 菜单，清空后恢复菜单音色；MiniMax / 无法识别家族的自定义模型必须填写；Fish Audio 可填 reference ID 或留空 |
 | **Audio Format** | 默认 `pcm`，插件会包装成 WAV 给 Bob 播放；也可选 `wav` / `mp3` / `opus` / `flac`（需 provider 支持） |
-| **PCM Sample Rate** | 返回内容按裸 PCM 包装成 WAV 时生效（通常 Audio Format 为 `pcm`），默认 `24 kHz`；若 provider 返回其他采样率的 PCM 导致播放变速，可在此调整 |
+| **PCM Sample Rate** | 返回内容按裸 PCM 包装成 WAV 时生效（通常 Audio Format 为 `pcm`），默认 `Auto`：按模型家族选择（Fish Audio 44.1 kHz、其他 24 kHz）；若播放仍变速可手动指定 |
 | **Speed** | 语速：0.5x ~ 2.0x，仅在非 1.0x 时发送，部分 provider 可能会忽略 |
 | **Instructions / Audio Tags** | 可选。会作为前缀拼到文本前，适合填写 Gemini audio tags 或简短风格提示 |
 
@@ -151,7 +151,7 @@
 ## 注意事项
 
 - 单次合成文本长度不能超过 4096 个字符。
-- 插件优先根据 inline audio / HTTP `Content-Type` 判断响应，明确拒绝 JSON、文本及其他非音频 MIME。明确请求或声明为 PCM 时，MP3 嗅探不会覆盖 PCM 判定；其他响应再用严格校验的 magic bytes 识别 WAV / MP3 / Ogg / FLAC。按裸 PCM 处理的内容会被包装成 16-bit、mono WAV，采样率默认 24kHz，可在 PCM Sample Rate 选项中调整。
+- 插件优先根据 inline audio / HTTP `Content-Type` 判断响应，明确拒绝 JSON、文本及其他非音频 MIME。明确请求或声明为 PCM 时，MP3 嗅探不会覆盖 PCM 判定；其他响应再用严格校验的 magic bytes 识别 WAV / MP3 / Ogg / FLAC。按裸 PCM 处理的内容会被包装成 16-bit、mono WAV，采样率默认 Auto（按模型家族：Fish Audio 44.1kHz、其他 24kHz），可在 PCM Sample Rate 选项中手动指定。
 - 如果选择 `mp3` / `wav` 等格式但当前 provider 不支持，OpenRouter 可能会返回错误或退回到默认格式。
 - `Speed` 仅在非 1.0x 时随请求发送，以兼容不支持该参数的模型。
 - 单次响应上限为 64 MiB；插件使用 Bob 1.8+ 的流式接口累计接收，超过上限会立即取消并报错。若安全流式接口不可用，插件会要求升级 Bob，不会退回到先完整缓冲的请求方式。
@@ -185,6 +185,7 @@ npm test
 
 ## Changelog
 
+- **1.3.2** — PCM Sample Rate 新增 `Auto` 默认档：按模型家族选择包装采样率（Fish Audio 44.1kHz、其他 24kHz），修复 Fish Audio 模型在 `pcm` 格式下声音低沉拖沓（44.1kHz PCM 被按 24kHz 包装导致慢放）；显式选择采样率的行为不变。
 - **1.3.1** — 新增 `Voice · Fish Audio` 菜单：收录常用 fish.audio 社区音色 reference ID（AD学姐、女大学生），并提供「默认音色」选项（不发送 voice）；Custom Voice 仍可填任意 reference ID 覆盖。
 - **1.3.0** — 同步 OpenRouter speech 模型目录（2026-08-01）：新增 Fish Audio S1 / S2 Pro / S2.1 Pro / S2.1 Pro Free（无预设音色，`Custom Voice` 留空时不发送 voice、使用 provider 默认音色，也可填 reference ID）、Microsoft MAI-Voice-2-Flash（复用 MAI 音色菜单）、Qwen-Audio-3.0-TTS Flash / Plus（各自独立音色菜单）。
 - **1.2.4** — 修复 Bob 1.20 的流式 `$data` 对象不暴露 `length` / `byteLength` 时正常音频被误判为长度无效；以单次分块 base64 计算字节数，并在后续 JSON 识别、格式嗅探和 WAV 包装中复用已知长度。
