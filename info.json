@@ -1,6 +1,6 @@
 {
   "identifier": "bob-plugin-openrouter-tts",
-  "version": "1.2.4",
+  "version": "1.3.0",
   "category": "tts",
   "name": "OpenRouter TTS",
   "summary": "使用 OpenRouter TTS API 进行语音合成，覆盖全部 speech-output 模型。",
@@ -36,7 +36,7 @@
       "type": "menu",
       "title": "Model",
       "defaultValue": "google/gemini-3.1-flash-tts-preview",
-      "desc": "OpenRouter speech-output 模型。通常使用下方对应的 Voice 菜单；Custom Voice 非空时会全局覆盖菜单音色。MiniMax 模型请在 Custom Voice 填写音色 ID。",
+      "desc": "OpenRouter speech-output 模型。通常使用下方对应的 Voice 菜单；Custom Voice 非空时会全局覆盖菜单音色。MiniMax 模型请在 Custom Voice 填写音色 ID；Fish Audio 可留空使用默认音色，或在 Custom Voice 填写 reference ID。",
       "menuValues": [
         {
           "title": "Gemini 3.1 Flash TTS Preview (Google)",
@@ -45,6 +45,10 @@
         {
           "title": "MAI-Voice-2 (Microsoft)",
           "value": "microsoft/mai-voice-2"
+        },
+        {
+          "title": "MAI-Voice-2-Flash (Microsoft)",
+          "value": "microsoft/mai-voice-2-flash"
         },
         {
           "title": "Grok Voice TTS 1.0 (xAI)",
@@ -85,6 +89,30 @@
         {
           "title": "Speech 2.8 Turbo (MiniMax)",
           "value": "minimax/speech-2.8-turbo"
+        },
+        {
+          "title": "S1 (Fish Audio)",
+          "value": "fish-audio/s1"
+        },
+        {
+          "title": "S2 Pro (Fish Audio)",
+          "value": "fish-audio/s2-pro"
+        },
+        {
+          "title": "S2.1 Pro (Fish Audio)",
+          "value": "fish-audio/s2.1-pro"
+        },
+        {
+          "title": "S2.1 Pro Free (Fish Audio·免费)",
+          "value": "fish-audio/s2.1-pro-free:free"
+        },
+        {
+          "title": "Qwen-Audio-3.0-TTS Flash (Qwen)",
+          "value": "qwen/qwen-audio-3.0-tts-flash"
+        },
+        {
+          "title": "Qwen-Audio-3.0-TTS Plus (Qwen)",
+          "value": "qwen/qwen-audio-3.0-tts-plus"
         },
         {
           "title": "Custom Model ID",
@@ -236,7 +264,7 @@
       "identifier": "voiceMicrosoft",
       "type": "menu",
       "title": "Voice · Microsoft MAI",
-      "desc": "用于 microsoft/mai-voice-2。",
+      "desc": "用于 microsoft/mai-voice-2 与 microsoft/mai-voice-2-flash。",
       "defaultValue": "en-US-Harper:MAI-Voice-2",
       "menuValues": [
         {
@@ -1113,11 +1141,45 @@
       ]
     },
     {
+      "identifier": "voiceQwenFlash",
+      "type": "menu",
+      "title": "Voice · Qwen Flash",
+      "desc": "用于 qwen/qwen-audio-3.0-tts-flash。",
+      "defaultValue": "loongjohn",
+      "menuValues": [
+        {
+          "title": "loongjohn",
+          "value": "loongjohn"
+        },
+        {
+          "title": "longanhuan_v3.6",
+          "value": "longanhuan_v3.6"
+        }
+      ]
+    },
+    {
+      "identifier": "voiceQwenPlus",
+      "type": "menu",
+      "title": "Voice · Qwen Plus",
+      "desc": "用于 qwen/qwen-audio-3.0-tts-plus。",
+      "defaultValue": "longanlingxin",
+      "menuValues": [
+        {
+          "title": "longanlingxin",
+          "value": "longanlingxin"
+        },
+        {
+          "title": "longanlufeng",
+          "value": "longanlufeng"
+        }
+      ]
+    },
+    {
       "identifier": "customVoice",
       "type": "text",
       "title": "Custom Voice",
       "defaultValue": "",
-      "desc": "可用于任意模型。非空时优先并覆盖对应的 Voice 菜单；清空后恢复菜单音色。MiniMax 与无法识别家族的自定义模型必须填写。",
+      "desc": "可用于任意模型。非空时优先并覆盖对应的 Voice 菜单；清空后恢复菜单音色。MiniMax 与无法识别家族的自定义模型必须填写；Fish Audio 可填 reference ID，留空则用 provider 默认音色。",
       "textConfig": {
         "type": "visible",
         "placeholderText": "填写自定义 voice ID（MiniMax 也可）"

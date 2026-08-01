@@ -15,6 +15,7 @@
 | --- | --- | --- | --- |
 | Gemini 3.1 Flash TTS Preview | `google/gemini-3.1-flash-tts-preview` | Voice · Gemini | 30 |
 | MAI-Voice-2 | `microsoft/mai-voice-2` | Voice · Microsoft MAI | 4 |
+| MAI-Voice-2-Flash | `microsoft/mai-voice-2-flash` | Voice · Microsoft MAI | 4 |
 | Grok Voice TTS 1.0 | `x-ai/grok-voice-tts-1.0` | Voice · Grok | 5 |
 | Zonos v0.1 Transformer | `zyphra/zonos-v0.1-transformer` | Voice · Zyphra Zonos | 5 |
 | Zonos v0.1 Hybrid | `zyphra/zonos-v0.1-hybrid` | Voice · Zyphra Zonos | 5 |
@@ -25,9 +26,15 @@
 | Aura-2 | `deepgram/aura-2` | Voice · Deepgram Aura-2 | 90 |
 | Speech 2.8 HD | `minimax/speech-2.8-hd` | Custom Voice | — |
 | Speech 2.8 Turbo | `minimax/speech-2.8-turbo` | Custom Voice | — |
+| S1 | `fish-audio/s1` | Custom Voice（可留空） | — |
+| S2 Pro | `fish-audio/s2-pro` | Custom Voice（可留空） | — |
+| S2.1 Pro | `fish-audio/s2.1-pro` | Custom Voice（可留空） | — |
+| S2.1 Pro Free | `fish-audio/s2.1-pro-free:free` | Custom Voice（可留空） | — |
+| Qwen-Audio-3.0-TTS Flash | `qwen/qwen-audio-3.0-tts-flash` | Voice · Qwen Flash | 2 |
+| Qwen-Audio-3.0-TTS Plus | `qwen/qwen-audio-3.0-tts-plus` | Voice · Qwen Plus | 2 |
 | 自定义模型 | `Custom Model ID` 填写 | Custom Voice | — |
 
-> 模型列表对应 OpenRouter [output_modalities=speech](https://openrouter.ai/models?output_modalities=speech) 的全部 12 个模型（2026-07-22 核对）。OpenAI `gpt-4o-mini-tts` 已从 OpenRouter 下架，故移除。MiniMax 两个模型接受任意音色 ID，请在 `Custom Voice` 中填写。新增模型可直接在 `Custom Model ID` 中填写 ID，并在 `Custom Voice` 里填对应音色。
+> 模型列表对应 OpenRouter [output_modalities=speech](https://openrouter.ai/models?output_modalities=speech) 的全部 19 个模型（2026-08-01 核对）。MiniMax 两个模型接受任意音色 ID，请在 `Custom Voice` 中填写。Fish Audio 四个模型无预设音色：留空 `Custom Voice` 时使用 provider 默认音色，也可填写 Fish Audio reference ID。新增模型可直接在 `Custom Model ID` 中填写 ID，并在 `Custom Voice` 里填对应音色。
 
 ## 配置
 
@@ -40,7 +47,7 @@
 | **Model** | TTS 模型，默认 `google/gemini-3.1-flash-tts-preview` |
 | **Custom Model ID** | 可选。填写完整模型 ID 时，会覆盖上方预设 |
 | **Voice · 各家族** | 各模型家族的音色菜单，详见上表 |
-| **Custom Voice** | 可用于任意模型；非空时优先并覆盖对应的 Voice 菜单，清空后恢复菜单音色；MiniMax / 无法识别家族的自定义模型必须填写 |
+| **Custom Voice** | 可用于任意模型；非空时优先并覆盖对应的 Voice 菜单，清空后恢复菜单音色；MiniMax / 无法识别家族的自定义模型必须填写；Fish Audio 可填 reference ID 或留空 |
 | **Audio Format** | 默认 `pcm`，插件会包装成 WAV 给 Bob 播放；也可选 `wav` / `mp3` / `opus` / `flac`（需 provider 支持） |
 | **PCM Sample Rate** | 返回内容按裸 PCM 包装成 WAV 时生效（通常 Audio Format 为 `pcm`），默认 `24 kHz`；若 provider 返回其他采样率的 PCM 导致播放变速，可在此调整 |
 | **Speed** | 语速：0.5x ~ 2.0x，仅在非 1.0x 时发送，部分 provider 可能会忽略 |
@@ -62,6 +69,9 @@
 | Voxtral | `mistralai/` 开头、含 `voxtral` | Voice · Voxtral |
 | Deepgram | `deepgram/` 开头、含 `aura-2` | Voice · Deepgram Aura-2 |
 | MiniMax | `minimax/` 开头、含 `speech-2.8` | Custom Voice（无预设菜单，需手动填写音色 ID） |
+| Fish Audio | `fish-audio/` 开头、含 `fish` | Custom Voice（无预设菜单；留空则不发送 voice，使用 provider 默认音色） |
+| Qwen Flash | `qwen/` 开头或含 `qwen-audio`，且不含 `plus` | Voice · Qwen Flash |
+| Qwen Plus | `qwen/` 开头或含 `qwen-audio`，且含 `plus` | Voice · Qwen Plus |
 | 其他自定义 | 未匹配到上述任一家族 | Custom Voice（无预设菜单，需手动填写音色 ID） |
 
 ## OpenRouter 配置示例
@@ -97,6 +107,14 @@
 | --- | --- |
 | **Model** | `minimax/speech-2.8-hd` 或 `minimax/speech-2.8-turbo` |
 | **Custom Voice** | 填写 MiniMax 音色 ID（模型接受任意音色 ID，无预设菜单） |
+| **Audio Format** | `mp3` 或 `pcm` |
+
+### Fish Audio S2.1 Pro（免费档可选）
+
+| 选项 | 值 |
+| --- | --- |
+| **Model** | `fish-audio/s2.1-pro`（或免费的 `fish-audio/s2.1-pro-free:free`） |
+| **Custom Voice** | 留空使用默认音色，或填写 Fish Audio reference ID |
 | **Audio Format** | `mp3` 或 `pcm` |
 
 `API URL` 也支持填写：
@@ -166,6 +184,7 @@ npm test
 
 ## Changelog
 
+- **1.3.0** — 同步 OpenRouter speech 模型目录（2026-08-01）：新增 Fish Audio S1 / S2 Pro / S2.1 Pro / S2.1 Pro Free（无预设音色，`Custom Voice` 留空时不发送 voice、使用 provider 默认音色，也可填 reference ID）、Microsoft MAI-Voice-2-Flash（复用 MAI 音色菜单）、Qwen-Audio-3.0-TTS Flash / Plus（各自独立音色菜单）。
 - **1.2.4** — 修复 Bob 1.20 的流式 `$data` 对象不暴露 `length` / `byteLength` 时正常音频被误判为长度无效；以单次分块 base64 计算字节数，并在后续 JSON 识别、格式嗅探和 WAV 包装中复用已知长度。
 - **1.2.3** — 兼容 JavaScriptCore 将 `$data.length` 以原生桥接数值而非普通 JavaScript `number` 暴露的情况。
 - **1.2.2** — 修正 JSON / rawData / MIME 音频判别；PCM 采样率与 API Key 作用域纳入 SHA-256 缓存键，并主动清理过期缓存；Custom Voice 可覆盖所有模型家族；远程自定义接口强制 HTTPS（loopback 调试除外）；API URL 补路径时正确保留 query / fragment；修正 Bob 巴西葡萄牙语代码为 `pt-br`；以流式累计实现 64 MiB 响应上限，移除不安全的完整缓冲回退，并用 Bob 原生二进制数据低内存包装 WAV；MP3 裸帧需连续有效帧才判定，且明确 PCM 时不采用 MP3 嗅探，避免误报。

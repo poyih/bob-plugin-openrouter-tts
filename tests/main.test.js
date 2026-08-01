@@ -387,6 +387,70 @@ test('Custom Voice overrides recognized-family menus and clearing restores the m
     assert.equal(second.state.requests[0].body.voice, 'Puck');
 });
 
+test('maps 2026-08 catalog additions to their voice families', () => {
+    const plugin = createFallbackPlugin(options(), () => ({}));
+    assert.equal(plugin.context.getModelFamily('microsoft/mai-voice-2-flash'), 'microsoft');
+    assert.equal(plugin.context.getModelFamily('fish-audio/s1'), 'fishaudio');
+    assert.equal(plugin.context.getModelFamily('fish-audio/s2.1-pro-free:free'), 'fishaudio');
+    assert.equal(plugin.context.getModelFamily('qwen/qwen-audio-3.0-tts-flash'), 'qwenflash');
+    assert.equal(plugin.context.getModelFamily('qwen/qwen-audio-3.0-tts-plus'), 'qwenplus');
+});
+
+test('Fish Audio omits voice when Custom Voice is empty and sends the reference ID otherwise', () => {
+    const pcm = Buffer.from([1, 2, 3, 4]);
+    const withoutVoice = createFallbackPlugin(options({ model: 'fish-audio/s1' }), () => ({
+        rawData: new MockData(pcm),
+        response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    const result = callTts(withoutVoice);
+    assert.ok(result.result);
+    assert.equal('voice' in withoutVoice.state.requests[0].body, false);
+
+    const withReference = createFallbackPlugin(
+        options({ model: 'fish-audio/s2.1-pro', customVoice: 'my-reference-id' }),
+        () => ({
+            rawData: new MockData(pcm),
+            response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        })
+    );
+    callTts(withReference);
+    assert.equal(withReference.state.requests[0].body.voice, 'my-reference-id');
+});
+
+test('Qwen flash and plus use separate voice menus with their own defaults', () => {
+    const pcm = Buffer.from([1, 2, 3, 4]);
+    const flash = createFallbackPlugin(options({ model: 'qwen/qwen-audio-3.0-tts-flash' }), () => ({
+        rawData: new MockData(pcm),
+        response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    callTts(flash);
+    assert.equal(flash.state.requests[0].body.voice, 'loongjohn');
+
+    const plus = createFallbackPlugin(
+        options({ model: 'qwen/qwen-audio-3.0-tts-plus', voiceQwenPlus: 'longanlufeng' }),
+        () => ({
+            rawData: new MockData(pcm),
+            response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        })
+    );
+    callTts(plus);
+    assert.equal(plus.state.requests[0].body.voice, 'longanlufeng');
+});
+
+test('MiniMax still requires Custom Voice while Fish Audio does not', () => {
+    const minimax = createFallbackPlugin(options({ model: 'minimax/speech-2.8-hd' }), () => ({}));
+    const result = callTts(minimax);
+    assert.match(result.error.message, /Custom Voice/);
+    assert.equal(minimax.state.requests.length, 0);
+
+    const fish = createFallbackPlugin(options({ model: 'fish-audio/s2-pro' }), () => ({
+        rawData: new MockData(Buffer.from([1, 2, 3, 4])),
+        response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    const fishResult = callTts(fish);
+    assert.ok(fishResult.result);
+});
+
 test('prefers inline audio over the JSON envelope rawData', () => {
     let rawBase64Calls = 0;
     const pcm = Buffer.from([0x10, 0x20, 0x30, 0x40]);

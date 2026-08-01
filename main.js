@@ -12,7 +12,8 @@ var MAX_AUDIO_BYTES = 64 * 1024 * 1024;
 var MAX_AUDIO_BASE64_CHARS = Math.ceil(MAX_AUDIO_BYTES / 3) * 4;
 var DEFAULT_API_URL = 'https://openrouter.ai/api/v1/audio/speech';
 var DEFAULT_MODEL = 'google/gemini-3.1-flash-tts-preview';
-// minimax 与 custom 家族无预设菜单，必须使用 customVoice；其他家族也可被 customVoice 全局覆盖。
+// minimax 与 custom 家族无预设菜单，必须使用 customVoice；fishaudio 无预设菜单但 voice 可留空
+// （provider 端默认音色），customVoice 可填 Fish Audio reference ID；其他家族也可被 customVoice 全局覆盖。
 var VOICE_OPTION_BY_FAMILY = {
     gemini: 'voiceGemini',
     microsoft: 'voiceMicrosoft',
@@ -22,7 +23,9 @@ var VOICE_OPTION_BY_FAMILY = {
     orpheus: 'voiceOrpheus',
     kokoro: 'voiceKokoro',
     voxtral: 'voiceVoxtral',
-    deepgram: 'voiceDeepgram'
+    deepgram: 'voiceDeepgram',
+    qwenflash: 'voiceQwenFlash',
+    qwenplus: 'voiceQwenPlus'
 };
 var DEFAULT_VOICE_BY_FAMILY = {
     gemini: 'Kore',
@@ -33,7 +36,9 @@ var DEFAULT_VOICE_BY_FAMILY = {
     orpheus: 'tara',
     kokoro: 'af_heart',
     voxtral: 'en_paul_neutral',
-    deepgram: 'aura-2-thalia-en'
+    deepgram: 'aura-2-thalia-en',
+    qwenflash: 'loongjohn',
+    qwenplus: 'longanlingxin'
 };
 var AUDIO_CACHE = {};
 var AUDIO_CACHE_ORDER = [];
@@ -154,6 +159,12 @@ function getModelFamily(model) {
     if (value.indexOf('minimax/') === 0 || value.indexOf('speech-2.8') !== -1) {
         return 'minimax';
     }
+    if (value.indexOf('fish-audio/') === 0 || value.indexOf('fish') !== -1) {
+        return 'fishaudio';
+    }
+    if (value.indexOf('qwen/') === 0 || value.indexOf('qwen-audio') !== -1) {
+        return value.indexOf('plus') !== -1 ? 'qwenplus' : 'qwenflash';
+    }
 
     return 'custom';
 }
@@ -166,7 +177,7 @@ function getVoice() {
         return customVoice;
     }
 
-    if (family === 'minimax' || family === 'custom') {
+    if (family === 'minimax' || family === 'fishaudio' || family === 'custom') {
         return '';
     }
 
@@ -343,7 +354,9 @@ function validateOptions() {
         if (family === 'custom' || family === 'minimax') {
             return { type: 'param', message: '当前模型无预设音色，请先在 Custom Voice 中填写音色 ID。' };
         }
-        return { type: 'param', message: '请先在插件设置中选择音色。' };
+        if (family !== 'fishaudio') {
+            return { type: 'param', message: '请先在插件设置中选择音色。' };
+        }
     }
     var apiUrlError = validateApiUrl();
     if (apiUrlError) {
@@ -860,9 +873,11 @@ function buildSpeechRequestBody(inputText, model, voice, format, speed) {
     var body = {
         model: model,
         input: inputText,
-        voice: voice,
         response_format: format
     };
+    if (voice) {
+        body.voice = voice;
+    }
     if (typeof speed === 'number' && !isNaN(speed) && speed !== 1.0) {
         body.speed = speed;
     }
