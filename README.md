@@ -26,15 +26,15 @@
 | Aura-2 | `deepgram/aura-2` | Voice · Deepgram Aura-2 | 90 |
 | Speech 2.8 HD | `minimax/speech-2.8-hd` | Custom Voice | — |
 | Speech 2.8 Turbo | `minimax/speech-2.8-turbo` | Custom Voice | — |
-| S1 | `fish-audio/s1` | Custom Voice（可留空） | — |
-| S2 Pro | `fish-audio/s2-pro` | Custom Voice（可留空） | — |
-| S2.1 Pro | `fish-audio/s2.1-pro` | Custom Voice（可留空） | — |
-| S2.1 Pro Free | `fish-audio/s2.1-pro-free:free` | Custom Voice（可留空） | — |
+| S1 | `fish-audio/s1` | Voice · Fish Audio | 2 + 默认 |
+| S2 Pro | `fish-audio/s2-pro` | Voice · Fish Audio | 2 + 默认 |
+| S2.1 Pro | `fish-audio/s2.1-pro` | Voice · Fish Audio | 2 + 默认 |
+| S2.1 Pro Free | `fish-audio/s2.1-pro-free:free` | Voice · Fish Audio | 2 + 默认 |
 | Qwen-Audio-3.0-TTS Flash | `qwen/qwen-audio-3.0-tts-flash` | Voice · Qwen Flash | 2 |
 | Qwen-Audio-3.0-TTS Plus | `qwen/qwen-audio-3.0-tts-plus` | Voice · Qwen Plus | 2 |
 | 自定义模型 | `Custom Model ID` 填写 | Custom Voice | — |
 
-> 模型列表对应 OpenRouter [output_modalities=speech](https://openrouter.ai/models?output_modalities=speech) 的全部 19 个模型（2026-08-01 核对）。MiniMax 两个模型接受任意音色 ID，请在 `Custom Voice` 中填写。Fish Audio 四个模型无预设音色：留空 `Custom Voice` 时使用 provider 默认音色，也可填写 Fish Audio reference ID。新增模型可直接在 `Custom Model ID` 中填写 ID，并在 `Custom Voice` 里填对应音色。
+> 模型列表对应 OpenRouter [output_modalities=speech](https://openrouter.ai/models?output_modalities=speech) 的全部 19 个模型（2026-08-01 核对）。MiniMax 两个模型接受任意音色 ID，请在 `Custom Voice` 中填写。Fish Audio 四个模型没有官方音色名单，音色来自 [fish.audio](https://fish.audio) 社区语音库：`Voice · Fish Audio` 菜单收录了常用 reference ID，选「默认音色」时不发送 voice、由 provider 决定；任何 fish.audio 音色页 URL 中的 ID 都可填入 `Custom Voice` 使用。新增模型可直接在 `Custom Model ID` 中填写 ID，并在 `Custom Voice` 里填对应音色。
 
 ## 配置
 
@@ -69,7 +69,7 @@
 | Voxtral | `mistralai/` 开头、含 `voxtral` | Voice · Voxtral |
 | Deepgram | `deepgram/` 开头、含 `aura-2` | Voice · Deepgram Aura-2 |
 | MiniMax | `minimax/` 开头、含 `speech-2.8` | Custom Voice（无预设菜单，需手动填写音色 ID） |
-| Fish Audio | `fish-audio/` 开头、含 `fish` | Custom Voice（无预设菜单；留空则不发送 voice，使用 provider 默认音色） |
+| Fish Audio | `fish-audio/` 开头、含 `fish` | Voice · Fish Audio（「默认音色」不发送 voice；Custom Voice 可填任意 fish.audio reference ID） |
 | Qwen Flash | `qwen/` 开头或含 `qwen-audio`，且不含 `plus` | Voice · Qwen Flash |
 | Qwen Plus | `qwen/` 开头或含 `qwen-audio`，且含 `plus` | Voice · Qwen Plus |
 | 其他自定义 | 未匹配到上述任一家族 | Custom Voice（无预设菜单，需手动填写音色 ID） |
@@ -114,7 +114,8 @@
 | 选项 | 值 |
 | --- | --- |
 | **Model** | `fish-audio/s2.1-pro`（或免费的 `fish-audio/s2.1-pro-free:free`） |
-| **Custom Voice** | 留空使用默认音色，或填写 Fish Audio reference ID |
+| **Voice · Fish Audio** | 菜单选择，或选「默认音色」 |
+| **Custom Voice** | 可选。填写任意 [fish.audio](https://fish.audio) 音色页 URL 中的 reference ID，覆盖菜单 |
 | **Audio Format** | `mp3` 或 `pcm` |
 
 `API URL` 也支持填写：
@@ -184,6 +185,7 @@ npm test
 
 ## Changelog
 
+- **1.3.1** — 新增 `Voice · Fish Audio` 菜单：收录常用 fish.audio 社区音色 reference ID（AD学姐、女大学生），并提供「默认音色」选项（不发送 voice）；Custom Voice 仍可填任意 reference ID 覆盖。
 - **1.3.0** — 同步 OpenRouter speech 模型目录（2026-08-01）：新增 Fish Audio S1 / S2 Pro / S2.1 Pro / S2.1 Pro Free（无预设音色，`Custom Voice` 留空时不发送 voice、使用 provider 默认音色，也可填 reference ID）、Microsoft MAI-Voice-2-Flash（复用 MAI 音色菜单）、Qwen-Audio-3.0-TTS Flash / Plus（各自独立音色菜单）。
 - **1.2.4** — 修复 Bob 1.20 的流式 `$data` 对象不暴露 `length` / `byteLength` 时正常音频被误判为长度无效；以单次分块 base64 计算字节数，并在后续 JSON 识别、格式嗅探和 WAV 包装中复用已知长度。
 - **1.2.3** — 兼容 JavaScriptCore 将 `$data.length` 以原生桥接数值而非普通 JavaScript `number` 暴露的情况。

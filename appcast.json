@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.3.1",
+      "desc": "新增 Voice · Fish Audio 菜单：收录 fish.audio 社区音色 AD学姐、女大学生（reference ID），并提供默认音色选项（不发送 voice）；Custom Voice 仍可填任意 reference ID 覆盖",
+      "sha256": "5db3fa55bfe24593767640671bdeaf26c8e6d5d1169831b410ec3c715eeb047b",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.3.1/openrouter-tts-1.3.1.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1785560034594
+    },
+    {
       "version": "1.3.0",
       "desc": "同步 OpenRouter speech 模型目录（2026-08-01）：新增 Fish Audio S1 / S2 Pro / S2.1 Pro / S2.1 Pro Free（Custom Voice 留空用默认音色，可填 reference ID）、Microsoft MAI-Voice-2-Flash、Qwen-Audio-3.0-TTS Flash / Plus（独立音色菜单）；共 19 个模型",
       "sha256": "45ee07b15f319ebd235c9c24d30b77e67943d0bf264c7cab9532b32023a2cfae",

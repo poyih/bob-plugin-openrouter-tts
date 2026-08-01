@@ -406,8 +406,28 @@ test('Fish Audio omits voice when Custom Voice is empty and sends the reference 
     assert.ok(result.result);
     assert.equal('voice' in withoutVoice.state.requests[0].body, false);
 
+    const withMenuVoice = createFallbackPlugin(
+        options({ model: 'fish-audio/s1', voiceFishAudio: '7f92f8afb8ec43bf81429cc1c9199cb1' }),
+        () => ({
+            rawData: new MockData(pcm),
+            response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        })
+    );
+    callTts(withMenuVoice);
+    assert.equal(withMenuVoice.state.requests[0].body.voice, '7f92f8afb8ec43bf81429cc1c9199cb1');
+
+    const withDefaultMenu = createFallbackPlugin(
+        options({ model: 'fish-audio/s1', voiceFishAudio: 'default' }),
+        () => ({
+            rawData: new MockData(pcm),
+            response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        })
+    );
+    callTts(withDefaultMenu);
+    assert.equal('voice' in withDefaultMenu.state.requests[0].body, false);
+
     const withReference = createFallbackPlugin(
-        options({ model: 'fish-audio/s2.1-pro', customVoice: 'my-reference-id' }),
+        options({ model: 'fish-audio/s2.1-pro', voiceFishAudio: 'default', customVoice: 'my-reference-id' }),
         () => ({
             rawData: new MockData(pcm),
             response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }

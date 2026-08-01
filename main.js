@@ -12,8 +12,9 @@ var MAX_AUDIO_BYTES = 64 * 1024 * 1024;
 var MAX_AUDIO_BASE64_CHARS = Math.ceil(MAX_AUDIO_BYTES / 3) * 4;
 var DEFAULT_API_URL = 'https://openrouter.ai/api/v1/audio/speech';
 var DEFAULT_MODEL = 'google/gemini-3.1-flash-tts-preview';
-// minimax 与 custom 家族无预设菜单，必须使用 customVoice；fishaudio 无预设菜单但 voice 可留空
-// （provider 端默认音色），customVoice 可填 Fish Audio reference ID；其他家族也可被 customVoice 全局覆盖。
+// minimax 与 custom 家族无预设菜单，必须使用 customVoice；fishaudio 菜单收录常用 reference ID，
+// 选 default 时不发送 voice（provider 端默认音色），customVoice 可填任意 reference ID；
+// 其他家族也可被 customVoice 全局覆盖。
 var VOICE_OPTION_BY_FAMILY = {
     gemini: 'voiceGemini',
     microsoft: 'voiceMicrosoft',
@@ -25,7 +26,8 @@ var VOICE_OPTION_BY_FAMILY = {
     voxtral: 'voiceVoxtral',
     deepgram: 'voiceDeepgram',
     qwenflash: 'voiceQwenFlash',
-    qwenplus: 'voiceQwenPlus'
+    qwenplus: 'voiceQwenPlus',
+    fishaudio: 'voiceFishAudio'
 };
 var DEFAULT_VOICE_BY_FAMILY = {
     gemini: 'Kore',
@@ -38,7 +40,8 @@ var DEFAULT_VOICE_BY_FAMILY = {
     voxtral: 'en_paul_neutral',
     deepgram: 'aura-2-thalia-en',
     qwenflash: 'loongjohn',
-    qwenplus: 'longanlingxin'
+    qwenplus: 'longanlingxin',
+    fishaudio: 'default'
 };
 var AUDIO_CACHE = {};
 var AUDIO_CACHE_ORDER = [];
@@ -177,11 +180,15 @@ function getVoice() {
         return customVoice;
     }
 
-    if (family === 'minimax' || family === 'fishaudio' || family === 'custom') {
+    if (family === 'minimax' || family === 'custom') {
         return '';
     }
 
-    return readOption(VOICE_OPTION_BY_FAMILY[family]) || DEFAULT_VOICE_BY_FAMILY[family];
+    var voice = readOption(VOICE_OPTION_BY_FAMILY[family]) || DEFAULT_VOICE_BY_FAMILY[family];
+    if (family === 'fishaudio' && voice === 'default') {
+        return '';
+    }
+    return voice;
 }
 
 function getResponseFormat() {
