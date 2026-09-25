@@ -396,6 +396,76 @@ test('maps 2026-08 catalog additions to their voice families', () => {
     assert.equal(plugin.context.getModelFamily('qwen/qwen-audio-3.0-tts-plus'), 'qwenplus');
 });
 
+test('maps 2026-09 catalog additions to their voice families', () => {
+    const plugin = createFallbackPlugin(options(), () => ({}));
+    assert.equal(plugin.context.getModelFamily('google/gemini-3.8-flash-tts'), 'gemini');
+    assert.equal(plugin.context.getModelFamily('google/gemini-3.8-flash-lite-tts'), 'gemini');
+    assert.equal(plugin.context.getModelFamily('deepgram/flux-tts:free'), 'deepgramflux');
+    assert.equal(plugin.context.getModelFamily('deepgram/flux-tts'), 'deepgramflux');
+    assert.equal(plugin.context.getModelFamily('deepgram/aura-2'), 'deepgram');
+});
+
+test('Deepgram Flux uses its own voice menu without affecting Aura-2 or Gemini 3.8', () => {
+    const pcm = Buffer.from([1, 2, 3, 4]);
+    const respond = () => ({
+        rawData: new MockData(pcm),
+        response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    });
+
+    const fluxDefault = createFallbackPlugin(options({ model: 'deepgram/flux-tts:free', pcmSampleRate: 'auto' }), respond);
+    const fluxResult = callTts(fluxDefault);
+    assert.equal(fluxDefault.state.requests[0].body.model, 'deepgram/flux-tts:free');
+    assert.equal(fluxDefault.state.requests[0].body.voice, 'flux-haley-en');
+    assert.equal(wavSampleRate(fluxResult.result.value), 24000);
+
+    const fluxMenu = createFallbackPlugin(
+        options({ model: 'deepgram/flux-tts:free', voiceDeepgramFlux: 'flux-kit-en', voiceDeepgram: 'aura-2-zeus-en' }),
+        respond
+    );
+    callTts(fluxMenu);
+    assert.equal(fluxMenu.state.requests[0].body.voice, 'flux-kit-en');
+
+    const fluxCustom = createFallbackPlugin(
+        options({ model: 'deepgram/flux-tts:free', voiceDeepgramFlux: 'flux-kit-en', customVoice: 'flux-renee-en' }),
+        respond
+    );
+    callTts(fluxCustom);
+    assert.equal(fluxCustom.state.requests[0].body.voice, 'flux-renee-en');
+
+    const aura = createFallbackPlugin(options({ model: 'deepgram/aura-2', voiceDeepgramFlux: 'flux-kit-en' }), respond);
+    callTts(aura);
+    assert.equal(aura.state.requests[0].body.voice, 'aura-2-thalia-en');
+
+    const gemini38 = createFallbackPlugin(options({ model: 'google/gemini-3.8-flash-lite-tts', voiceGemini: 'Puck' }), respond);
+    callTts(gemini38);
+    assert.equal(gemini38.state.requests[0].body.voice, 'Puck');
+});
+
+test('info.json catalog stays consistent with the voice families in main.js', () => {
+    const info = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'info.json'), 'utf8'));
+    const byId = Object.fromEntries(info.options.map((option) => [option.identifier, option]));
+    const plugin = createFallbackPlugin(options(), () => ({}));
+    const modelIds = byId.model.menuValues.map((entry) => entry.value).filter((value) => value !== 'custom');
+    assert.equal(modelIds.length, 22);
+    assert.equal(new Set(modelIds).size, modelIds.length);
+    for (const modelId of modelIds) {
+        const family = plugin.context.getModelFamily(modelId);
+        assert.notEqual(family, 'custom', `${modelId} should map to a known family`);
+        const optionId = plugin.context.VOICE_OPTION_BY_FAMILY[family];
+        if (family === 'minimax') {
+            assert.equal(optionId, undefined);
+            continue;
+        }
+        assert.ok(byId[optionId], `${modelId} needs the ${optionId} menu`);
+        const values = byId[optionId].menuValues.map((entry) => entry.value);
+        assert.equal(new Set(values).size, values.length, `${optionId} has duplicate voices`);
+        assert.ok(values.includes(byId[optionId].defaultValue), `${optionId} default must be in the menu`);
+        assert.equal(byId[optionId].defaultValue, plugin.context.DEFAULT_VOICE_BY_FAMILY[family]);
+    }
+    assert.equal(byId.voiceDeepgramFlux.menuValues.length, 36);
+    assert.ok(byId.voiceDeepgramFlux.menuValues.every((entry) => /^flux-[a-z]+-en$/.test(entry.value)));
+});
+
 test('Fish Audio omits voice when Custom Voice is empty and sends the reference ID otherwise', () => {
     const pcm = Buffer.from([1, 2, 3, 4]);
     const withoutVoice = createFallbackPlugin(options({ model: 'fish-audio/s1' }), () => ({

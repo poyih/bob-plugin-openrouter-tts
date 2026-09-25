@@ -25,6 +25,7 @@ var VOICE_OPTION_BY_FAMILY = {
     kokoro: 'voiceKokoro',
     voxtral: 'voiceVoxtral',
     deepgram: 'voiceDeepgram',
+    deepgramflux: 'voiceDeepgramFlux',
     qwenflash: 'voiceQwenFlash',
     qwenplus: 'voiceQwenPlus',
     fishaudio: 'voiceFishAudio'
@@ -39,6 +40,7 @@ var DEFAULT_VOICE_BY_FAMILY = {
     kokoro: 'af_heart',
     voxtral: 'en_paul_neutral',
     deepgram: 'aura-2-thalia-en',
+    deepgramflux: 'flux-haley-en',
     qwenflash: 'loongjohn',
     qwenplus: 'longanlingxin',
     fishaudio: 'default'
@@ -155,6 +157,10 @@ function getModelFamily(model) {
     }
     if (value.indexOf('mistralai/') === 0 || value.indexOf('voxtral') !== -1) {
         return 'voxtral';
+    }
+    // Flux TTS 先于通用 deepgram 前缀判断，避免落入 Aura-2 音色菜单。
+    if (value.indexOf('deepgram/flux') === 0 || value.indexOf('flux-tts') !== -1) {
+        return 'deepgramflux';
     }
     if (value.indexOf('deepgram/') === 0 || value.indexOf('aura-2') !== -1) {
         return 'deepgram';

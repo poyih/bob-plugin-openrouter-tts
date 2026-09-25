@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.4.0",
+      "desc": "同步 OpenRouter speech 模型目录（2026-09-25）：新增 Google Gemini 3.8 Flash TTS / Flash Lite TTS（复用 Gemini 音色菜单）、Deepgram Flux TTS 免费档（新增 Voice · Deepgram Flux 菜单，36 个英语音色）；共 22 个模型，无模型下架",
+      "sha256": "df0e5a7071e1a89d066e818764f1b79f9c25538f2446e47a6ba85724fc6324f1",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.4.0/openrouter-tts-1.4.0.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1790299770586
+    },
+    {
       "version": "1.3.2",
       "desc": "PCM Sample Rate 新增 Auto 默认档，按模型家族选择包装采样率（Fish Audio 44.1kHz、其他 24kHz），修复 Fish Audio 在 pcm 格式下声音低沉拖沓；显式选择采样率的行为不变",
       "sha256": "1569b27297b71a2a7e58b8a31ea3bddb3c5aafad736dbe8299103b29948a70d4",

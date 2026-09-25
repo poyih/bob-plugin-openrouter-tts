@@ -1,6 +1,6 @@
 {
   "identifier": "bob-plugin-openrouter-tts",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "category": "tts",
   "name": "OpenRouter TTS",
   "summary": "使用 OpenRouter TTS API 进行语音合成，覆盖全部 speech-output 模型。",
@@ -43,6 +43,14 @@
           "value": "google/gemini-3.1-flash-tts-preview"
         },
         {
+          "title": "Gemini 3.8 Flash TTS (Google)",
+          "value": "google/gemini-3.8-flash-tts"
+        },
+        {
+          "title": "Gemini 3.8 Flash Lite TTS (Google)",
+          "value": "google/gemini-3.8-flash-lite-tts"
+        },
+        {
           "title": "MAI-Voice-2 (Microsoft)",
           "value": "microsoft/mai-voice-2"
         },
@@ -81,6 +89,10 @@
         {
           "title": "Aura-2 (Deepgram)",
           "value": "deepgram/aura-2"
+        },
+        {
+          "title": "Flux TTS (Deepgram·免费)",
+          "value": "deepgram/flux-tts:free"
         },
         {
           "title": "Speech 2.8 HD (MiniMax)",
@@ -1137,6 +1149,159 @@
         {
           "title": "Zeus — English (en)",
           "value": "aura-2-zeus-en"
+        }
+      ]
+    },
+    {
+      "identifier": "voiceDeepgramFlux",
+      "type": "menu",
+      "title": "Voice · Deepgram Flux",
+      "desc": "用于 deepgram/flux-tts:free。36 个英语音色，覆盖美式 / 英式 / 爱尔兰 / 澳式 / 印度 / 新加坡 / 菲律宾口音。",
+      "defaultValue": "flux-haley-en",
+      "menuValues": [
+        {
+          "title": "Haley — American (美式·女)",
+          "value": "flux-haley-en"
+        },
+        {
+          "title": "Alexis — American (美式·女)",
+          "value": "flux-alexis-en"
+        },
+        {
+          "title": "Bree — American (美式·女)",
+          "value": "flux-bree-en"
+        },
+        {
+          "title": "Brittany — American (美式·女)",
+          "value": "flux-brittany-en"
+        },
+        {
+          "title": "Brooke — American (美式·女)",
+          "value": "flux-brooke-en"
+        },
+        {
+          "title": "Bruce — American (美式·男)",
+          "value": "flux-bruce-en"
+        },
+        {
+          "title": "Cliff — American (美式·男)",
+          "value": "flux-cliff-en"
+        },
+        {
+          "title": "Cole — American (美式·男)",
+          "value": "flux-cole-en"
+        },
+        {
+          "title": "Colin — British (英式·男)",
+          "value": "flux-colin-en"
+        },
+        {
+          "title": "Conor — British (英式·男)",
+          "value": "flux-conor-en"
+        },
+        {
+          "title": "Donovan — American (美式·男)",
+          "value": "flux-donovan-en"
+        },
+        {
+          "title": "Drew — American (美式·男)",
+          "value": "flux-drew-en"
+        },
+        {
+          "title": "Elise — American (美式·女)",
+          "value": "flux-elise-en"
+        },
+        {
+          "title": "Gemma — British (英式·女)",
+          "value": "flux-gemma-en"
+        },
+        {
+          "title": "Hannah — American (美式·女)",
+          "value": "flux-hannah-en"
+        },
+        {
+          "title": "Heather — American (美式·女)",
+          "value": "flux-heather-en"
+        },
+        {
+          "title": "Jack — British (英式·男)",
+          "value": "flux-jack-en"
+        },
+        {
+          "title": "Kai — Singaporean (新加坡·男)",
+          "value": "flux-kai-en"
+        },
+        {
+          "title": "Kelsey — American (美式·女)",
+          "value": "flux-kelsey-en"
+        },
+        {
+          "title": "Kit — British (英式·男)",
+          "value": "flux-kit-en"
+        },
+        {
+          "title": "Maeve — Irish (爱尔兰·女)",
+          "value": "flux-maeve-en"
+        },
+        {
+          "title": "Marcelo — Filipino (菲律宾·男)",
+          "value": "flux-marcelo-en"
+        },
+        {
+          "title": "Marcus — American (美式·男)",
+          "value": "flux-marcus-en"
+        },
+        {
+          "title": "Meena — Indian (印度·女)",
+          "value": "flux-meena-en"
+        },
+        {
+          "title": "Meghan — American (美式·女)",
+          "value": "flux-meghan-en"
+        },
+        {
+          "title": "Miles — American (美式·男)",
+          "value": "flux-miles-en"
+        },
+        {
+          "title": "Naveen — Indian (印度·男)",
+          "value": "flux-naveen-en"
+        },
+        {
+          "title": "Paige — American (美式·女)",
+          "value": "flux-paige-en"
+        },
+        {
+          "title": "Priya — Indian (印度·女)",
+          "value": "flux-priya-en"
+        },
+        {
+          "title": "Rufus — British (英式·男)",
+          "value": "flux-rufus-en"
+        },
+        {
+          "title": "Sean — British (英式·男)",
+          "value": "flux-sean-en"
+        },
+        {
+          "title": "Sharon — Australian (澳式·女)",
+          "value": "flux-sharon-en"
+        },
+        {
+          "title": "Sienna — American (美式·女)",
+          "value": "flux-sienna-en"
+        },
+        {
+          "title": "Tanner — British (英式·男)",
+          "value": "flux-tanner-en"
+        },
+        {
+          "title": "Wade — American (美式·男)",
+          "value": "flux-wade-en"
+        },
+        {
+          "title": "Wes — American (美式·男)",
+          "value": "flux-wes-en"
         }
       ]
     },
