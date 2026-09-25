@@ -3,11 +3,11 @@
   "versions": [
     {
       "version": "1.4.0",
-      "desc": "同步 OpenRouter speech 模型目录（2026-09-25）：新增 Google Gemini 3.8 Flash TTS / Flash Lite TTS（复用 Gemini 音色菜单）、Deepgram Flux TTS 免费档（新增 Voice · Deepgram Flux 菜单，36 个英语音色）；共 22 个模型，无模型下架",
-      "sha256": "df0e5a7071e1a89d066e818764f1b79f9c25538f2446e47a6ba85724fc6324f1",
+      "desc": "同步 OpenRouter speech 模型目录（2026-09-25）：新增 Google Gemini 3.8 Flash TTS / Flash Lite TTS（复用 Gemini 音色菜单）、Deepgram Flux TTS 免费档（新增 Voice · Deepgram Flux 菜单，36 个英语音色）；移除已下架的 Zyphra Zonos v0.1 Transformer / Hybrid 预设及 Voice · Zyphra Zonos 菜单；共 20 个模型",
+      "sha256": "d8c4271a70b72929c101512543d5e56e6f2c37d95cdb90071a2698c8531c2284",
       "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.4.0/openrouter-tts-1.4.0.bobplugin",
       "minBobVersion": "1.8.0",
-      "timestamp": 1790299770586
+      "timestamp": 1790316532758
     },
     {
       "version": "1.3.2",

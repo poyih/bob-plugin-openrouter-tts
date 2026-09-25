@@ -63,14 +63,6 @@
           "value": "x-ai/grok-voice-tts-1.0"
         },
         {
-          "title": "Zonos v0.1 Transformer (Zyphra)",
-          "value": "zyphra/zonos-v0.1-transformer"
-        },
-        {
-          "title": "Zonos v0.1 Hybrid (Zyphra)",
-          "value": "zyphra/zonos-v0.1-hybrid"
-        },
-        {
           "title": "CSM 1B (Sesame)",
           "value": "sesame/csm-1b"
         },
@@ -323,35 +315,6 @@
         {
           "title": "leo",
           "value": "leo"
-        }
-      ]
-    },
-    {
-      "identifier": "voiceZyphra",
-      "type": "menu",
-      "title": "Voice · Zyphra Zonos",
-      "desc": "用于 zyphra/zonos-v0.1-transformer 与 zyphra/zonos-v0.1-hybrid。",
-      "defaultValue": "american_female",
-      "menuValues": [
-        {
-          "title": "American Female (美式·女)",
-          "value": "american_female"
-        },
-        {
-          "title": "American Male (美式·男)",
-          "value": "american_male"
-        },
-        {
-          "title": "British Female (英式·女)",
-          "value": "british_female"
-        },
-        {
-          "title": "British Male (英式·男)",
-          "value": "british_male"
-        },
-        {
-          "title": "Random (随机)",
-          "value": "random"
         }
       ]
     },

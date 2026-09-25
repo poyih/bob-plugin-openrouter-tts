@@ -446,7 +446,7 @@ test('info.json catalog stays consistent with the voice families in main.js', ()
     const byId = Object.fromEntries(info.options.map((option) => [option.identifier, option]));
     const plugin = createFallbackPlugin(options(), () => ({}));
     const modelIds = byId.model.menuValues.map((entry) => entry.value).filter((value) => value !== 'custom');
-    assert.equal(modelIds.length, 22);
+    assert.equal(modelIds.length, 20);
     assert.equal(new Set(modelIds).size, modelIds.length);
     for (const modelId of modelIds) {
         const family = plugin.context.getModelFamily(modelId);

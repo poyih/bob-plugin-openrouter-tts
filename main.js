@@ -19,7 +19,6 @@ var VOICE_OPTION_BY_FAMILY = {
     gemini: 'voiceGemini',
     microsoft: 'voiceMicrosoft',
     grok: 'voiceGrok',
-    zyphra: 'voiceZyphra',
     sesame: 'voiceSesame',
     orpheus: 'voiceOrpheus',
     kokoro: 'voiceKokoro',
@@ -34,7 +33,6 @@ var DEFAULT_VOICE_BY_FAMILY = {
     gemini: 'Kore',
     microsoft: 'en-US-Harper:MAI-Voice-2',
     grok: 'eve',
-    zyphra: 'american_female',
     sesame: 'conversational_a',
     orpheus: 'tara',
     kokoro: 'af_heart',
@@ -142,9 +140,6 @@ function getModelFamily(model) {
     }
     if (value.indexOf('x-ai/') === 0 || value.indexOf('grok-voice') !== -1) {
         return 'grok';
-    }
-    if (value.indexOf('zyphra/') === 0 || value.indexOf('zonos') !== -1) {
-        return 'zyphra';
     }
     if (value.indexOf('sesame/') === 0 || value.indexOf('csm-1b') !== -1) {
         return 'sesame';

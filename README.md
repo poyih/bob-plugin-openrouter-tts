@@ -19,8 +19,6 @@
 | MAI-Voice-2 | `microsoft/mai-voice-2` | Voice · Microsoft MAI | 4 |
 | MAI-Voice-2-Flash | `microsoft/mai-voice-2-flash` | Voice · Microsoft MAI | 4 |
 | Grok Voice TTS 1.0 | `x-ai/grok-voice-tts-1.0` | Voice · Grok | 5 |
-| Zonos v0.1 Transformer | `zyphra/zonos-v0.1-transformer` | Voice · Zyphra Zonos | 5 |
-| Zonos v0.1 Hybrid | `zyphra/zonos-v0.1-hybrid` | Voice · Zyphra Zonos | 5 |
 | CSM 1B | `sesame/csm-1b` | Voice · Sesame CSM | 7 |
 | Orpheus 3B | `canopylabs/orpheus-3b-0.1-ft` | Voice · Orpheus | 7 |
 | Kokoro 82M | `hexgrad/kokoro-82m` | Voice · Kokoro | 54 |
@@ -37,7 +35,7 @@
 | Qwen-Audio-3.0-TTS Plus | `qwen/qwen-audio-3.0-tts-plus` | Voice · Qwen Plus | 2 |
 | 自定义模型 | `Custom Model ID` 填写 | Custom Voice | — |
 
-> 模型列表对应 OpenRouter [output_modalities=speech](https://openrouter.ai/models?output_modalities=speech) 的全部 22 个模型（2026-09-25 核对）。Gemini 3.8 Flash TTS / Flash Lite TTS 与 3.1 Preview 共用同一组 30 个预置音色，Google Voice Design / Voice Replication 生成的 `voice_...` ID 可填入 `Custom Voice`。Deepgram Flux TTS 目前仅提供免费档（有速率限制），36 个英语音色覆盖美式 / 英式 / 爱尔兰 / 澳式 / 印度 / 新加坡 / 菲律宾口音。MiniMax 两个模型接受任意音色 ID，请在 `Custom Voice` 中填写。Fish Audio 四个模型没有官方音色名单，音色来自 [fish.audio](https://fish.audio) 社区语音库：`Voice · Fish Audio` 菜单收录了常用 reference ID，选「默认音色」时不发送 voice、由 provider 决定；任何 fish.audio 音色页 URL 中的 ID 都可填入 `Custom Voice` 使用。新增模型可直接在 `Custom Model ID` 中填写 ID，并在 `Custom Voice` 里填对应音色。
+> 模型列表对应 OpenRouter [output_modalities=speech](https://openrouter.ai/models?output_modalities=speech) 的全部 20 个模型（2026-09-25 以实时 API 核对，模型 ID 与各菜单音色均与 `supported_voices` 一致）。Zyphra Zonos v0.1 Transformer / Hybrid 已在 OpenRouter 下架（模型页仍在，但无可用 endpoint），对应预设与 `Voice · Zyphra Zonos` 菜单已移除。Gemini 3.8 Flash TTS / Flash Lite TTS 与 3.1 Preview 共用同一组 30 个预置音色，Google Voice Design / Voice Replication 生成的 `voice_...` ID 可填入 `Custom Voice`。Deepgram Flux TTS 目前仅提供免费档（有速率限制；付费档 `deepgram/flux-tts` 尚无可用 endpoint），36 个英语音色覆盖美式 / 英式 / 爱尔兰 / 澳式 / 印度 / 新加坡 / 菲律宾口音。MiniMax 两个模型接受任意音色 ID，请在 `Custom Voice` 中填写。Fish Audio 四个模型没有官方音色名单，音色来自 [fish.audio](https://fish.audio) 社区语音库：`Voice · Fish Audio` 菜单收录了常用 reference ID，选「默认音色」时不发送 voice、由 provider 决定；任何 fish.audio 音色页 URL 中的 ID 都可填入 `Custom Voice` 使用。新增模型可直接在 `Custom Model ID` 中填写 ID，并在 `Custom Voice` 里填对应音色。
 
 ## 配置
 
@@ -65,7 +63,6 @@
 | Gemini | 含 `gemini` | Voice · Gemini |
 | Microsoft | `microsoft/` 开头、含 `mai-voice` | Voice · Microsoft MAI |
 | xAI Grok | `x-ai/` 开头、含 `grok-voice` | Voice · Grok |
-| Zyphra | `zyphra/` 开头、含 `zonos` | Voice · Zyphra Zonos |
 | Sesame | `sesame/` 开头、含 `csm-1b` | Voice · Sesame CSM |
 | Canopy Orpheus | `canopylabs/` 开头、含 `orpheus` | Voice · Orpheus |
 | Kokoro | `hexgrad/` 开头、含 `kokoro` | Voice · Kokoro |
@@ -174,7 +171,7 @@
 
 自动、中文（简/繁）、英语、日语、韩语、法语、德语、西班牙语、意大利语、葡萄牙语、葡萄牙语（巴西）、俄语、阿拉伯语、泰语、越南语、印尼语、马来语、土耳其语、波兰语、荷兰语、瑞典语、丹麦语、挪威语、芬兰语、希腊语、捷克语、罗马尼亚语、匈牙利语、斯洛伐克语、乌克兰语、保加利亚语、克罗地亚语、印地语、孟加拉语、泰米尔语、泰卢固语、马拉雅拉姆语、希伯来语、菲律宾语。
 
-> 各模型实际支持的语言不同（例如 Kokoro / MAI-Voice-2 / Voxtral / Deepgram Aura-2 为多语言，Zonos / Orpheus 主要为英语，Deepgram Flux 仅英语），请按所选模型挑选合适的音色。
+> 各模型实际支持的语言不同（例如 Kokoro / MAI-Voice-2 / Voxtral / Deepgram Aura-2 为多语言，Orpheus 主要为英语，Deepgram Flux 仅英语），请按所选模型挑选合适的音色。
 
 ## 开发
 
@@ -197,7 +194,7 @@ npm test
 
 ## Changelog
 
-- **1.4.0** — 同步 OpenRouter speech 模型目录（2026-09-25）：新增 Google Gemini 3.8 Flash TTS / Flash Lite TTS（复用 `Voice · Gemini` 菜单，Voice Design / Replication 的 `voice_...` ID 可填 Custom Voice）、Deepgram Flux TTS 免费档（新增 `Voice · Deepgram Flux` 菜单，36 个英语音色，默认 `flux-haley-en`）；共 22 个模型，无模型下架。
+- **1.4.0** — 同步 OpenRouter speech 模型目录（2026-09-25）：新增 Google Gemini 3.8 Flash TTS / Flash Lite TTS（复用 `Voice · Gemini` 菜单，Voice Design / Replication 的 `voice_...` ID 可填 Custom Voice）、Deepgram Flux TTS 免费档（新增 `Voice · Deepgram Flux` 菜单，36 个英语音色，默认 `flux-haley-en`）；移除已下架的 Zyphra Zonos v0.1 Transformer / Hybrid 预设及 `Voice · Zyphra Zonos` 菜单（OpenRouter 已无可用 endpoint）；共 20 个模型（2026-09-25 以实时 API 复核）。
 - **1.3.2** — PCM Sample Rate 新增 `Auto` 默认档：按模型家族选择包装采样率（Fish Audio 44.1kHz、其他 24kHz），修复 Fish Audio 模型在 `pcm` 格式下声音低沉拖沓（44.1kHz PCM 被按 24kHz 包装导致慢放）；显式选择采样率的行为不变。
 - **1.3.1** — 新增 `Voice · Fish Audio` 菜单：收录常用 fish.audio 社区音色 reference ID（AD学姐、女大学生），并提供「默认音色」选项（不发送 voice）；Custom Voice 仍可填任意 reference ID 覆盖。
 - **1.3.0** — 同步 OpenRouter speech 模型目录（2026-08-01）：新增 Fish Audio S1 / S2 Pro / S2.1 Pro / S2.1 Pro Free（无预设音色，`Custom Voice` 留空时不发送 voice、使用 provider 默认音色，也可填 reference ID）、Microsoft MAI-Voice-2-Flash（复用 MAI 音色菜单）、Qwen-Audio-3.0-TTS Flash / Plus（各自独立音色菜单）。
