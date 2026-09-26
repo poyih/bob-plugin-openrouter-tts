@@ -180,17 +180,23 @@
 - `info.json` — 插件元信息与配置项定义
 - `main.js` — TTS 调用逻辑
 
-构建 `.bobplugin` 文件：
-
-```bash
-zip -j openrouter-tts.bobplugin info.json main.js
-```
-
 运行回归测试：
 
 ```bash
 npm test
 ```
+
+本地构建 `.bobplugin` 文件（确定性打包到 `dist/`，同一份源码在任何机器上得到同一个 sha256）：
+
+```bash
+python3 scripts/release.py --version 1.4.0 --no-appcast
+```
+
+## 发布
+
+1. 把版本号写进 `info.json`（或运行 `python3 scripts/release.py --prepare-version 1.4.0`），在下方 Changelog 加一行 `- **1.4.0** — ...`，提交并推送到 `main`。
+2. 给该提交打 tag：`git tag v1.4.0 && git push origin v1.4.0`。
+3. GitHub Actions（`.github/workflows/release.yml`）会从 tag 检出源码跑测试、确定性打包、计算 sha256、创建 Release 并上传安装包，再把 `appcast.json` 提交回 `main`。Bob 靠 `appcast.json` 检查更新，安装包先于 appcast 记录出现，不会出现指向 404 的更新记录。Release 正文和 appcast 的 `desc` 都取自 Changelog 里该版本那一行。
 
 ## Changelog
 

@@ -1,0 +1,100 @@
+name: Release
+
+# 发布流程：先把版本号写进 info.json、在 README Changelog 加一行，提交并推送到 main，
+# 再给同一提交打 tag：
+#   git tag v1.4.0 && git push origin v1.4.0
+# 本工作流会从 tag 检出源码跑测试、确定性打包、创建 Release 上传安装包，
+# 最后把 appcast.json 提交回默认分支。
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+# release job 串行执行；appcast 本身还会按语义版本排序，不依赖排队顺序。
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # source 永远固定到 tag SHA，测试和发布包都从这里产生。
+      - name: 检出 tag 源码
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          path: source
+
+      # metadata 只承载 appcast 的更新，不能拿它来构建 tag 的发布包。
+      - name: 检出默认分支元数据
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+          path: metadata
+
+      - name: 读取版本号
+        id: meta
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          VERSION="${TAG_NAME#v}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::tag 必须形如 v1.4.0，收到 $TAG_NAME"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: 校验 tag 已包含在默认分支里
+        working-directory: source
+        env:
+          BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git fetch origin "$BRANCH"
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" "origin/$BRANCH"; then
+            echo "::error::tag $GITHUB_REF_NAME 指向的提交不在 $BRANCH 上。"
+            echo "::error::请先推送版本提交，再给该提交打 tag。"
+            exit 1
+          fi
+
+      - name: 跑测试
+        working-directory: source
+        run: npm test
+
+      - name: 从 tag 打包并更新默认分支 appcast
+        working-directory: source
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          REPOSITORY: ${{ github.repository }}
+          METADATA_ROOT: ${{ github.workspace }}/metadata
+        run: |
+          python3 scripts/release.py \
+            --version "$VERSION" \
+            --repo "$REPOSITORY" \
+            --metadata-root "$METADATA_ROOT"
+
+      # 先让下载资产真实存在，再把 appcast 暴露给 Bob；若 Release 创建失败，
+      # 用户不会拿到一个暂时指向 404 的更新记录。
+      - name: 创建 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: v${{ steps.meta.outputs.version }}
+          files: source/dist/*.bobplugin
+          body_path: source/dist/release-notes.md
+
+      - name: 提交 appcast
+        working-directory: metadata
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+          BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add appcast.json
+          git diff --cached --quiet || git commit -m "chore: publish appcast v$VERSION"
+          git push origin "HEAD:$BRANCH"
