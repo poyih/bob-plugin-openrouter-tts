@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.4.0",
+      "desc": "同步 OpenRouter speech 模型目录（2026-09-25）：新增 Google Gemini 3.8 Flash TTS / Flash Lite TTS（复用 Voice · Gemini 菜单，Voice Design / Replication 的 voice_... ID 可填 Custom Voice）、Deepgram Flux TTS 免费档（新增 Voice · Deepgram Flux 菜单，36 个英语音色，默认 flux-haley-en）；移除已下架的 Zyphra Zonos v0.1 Transformer / Hybrid 预设及 Voice · Zyphra Zonos 菜单（OpenRouter 已无可用 endpoint）；共 20 个模型（2026-09-25 以实时 API 复核）",
+      "sha256": "d855652d95f37197053cd33620c39176b6ec84ac62579e3091250b8f187c51af",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.4.0/openrouter-tts-1.4.0.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1790396526193
+    },
+    {
       "version": "1.3.2",
       "desc": "PCM Sample Rate 新增 Auto 默认档，按模型家族选择包装采样率（Fish Audio 44.1kHz、其他 24kHz），修复 Fish Audio 在 pcm 格式下声音低沉拖沓；显式选择采样率的行为不变",
       "sha256": "1569b27297b71a2a7e58b8a31ea3bddb3c5aafad736dbe8299103b29948a70d4",
