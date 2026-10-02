@@ -2,6 +2,13 @@
   "name": "bob-plugin-openrouter-tts",
   "private": true,
   "scripts": {
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "test:python": "python3 -m unittest discover -s tests -p 'test_*.py'",
+    "catalog:generate": "python3 scripts/generate_catalog.py",
+    "catalog:check": "python3 scripts/generate_catalog.py --check",
+    "catalog:live": "python3 scripts/check_catalog.py"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

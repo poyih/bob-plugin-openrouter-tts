@@ -12,37 +12,460 @@ var MAX_AUDIO_BYTES = 64 * 1024 * 1024;
 var MAX_AUDIO_BASE64_CHARS = Math.ceil(MAX_AUDIO_BYTES / 3) * 4;
 var DEFAULT_API_URL = 'https://openrouter.ai/api/v1/audio/speech';
 var DEFAULT_MODEL = 'google/gemini-3.1-flash-tts-preview';
-// minimax 与 custom 家族无预设菜单，必须使用 customVoice；fishaudio 菜单收录常用 reference ID，
-// 选 default 时不发送 voice（provider 端默认音色），customVoice 可填任意 reference ID；
-// 其他家族也可被 customVoice 全局覆盖。
-var VOICE_OPTION_BY_FAMILY = {
-    gemini: 'voiceGemini',
-    microsoft: 'voiceMicrosoft',
-    grok: 'voiceGrok',
-    sesame: 'voiceSesame',
-    orpheus: 'voiceOrpheus',
-    kokoro: 'voiceKokoro',
-    voxtral: 'voiceVoxtral',
-    deepgram: 'voiceDeepgram',
-    deepgramflux: 'voiceDeepgramFlux',
-    qwenflash: 'voiceQwenFlash',
-    qwenplus: 'voiceQwenPlus',
-    fishaudio: 'voiceFishAudio'
+// BEGIN GENERATED MODEL CATALOG
+// 编辑 catalog.json 后运行 python3 scripts/generate_catalog.py。
+var MODEL_CATALOG = {
+    "families": {
+        "gemini": {
+            "prefixes": [],
+            "contains": [
+                "gemini"
+            ],
+            "voiceOption": "voiceGemini",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "Kore"
+        },
+        "microsoft21flash": {
+            "prefixes": [
+                "microsoft/mai-voice-2.1-flash"
+            ],
+            "contains": [],
+            "voiceOption": "voiceMicrosoft21Flash",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "en-US-Harper:MAI-Voice-2.1-Flash"
+        },
+        "microsoft21": {
+            "prefixes": [
+                "microsoft/mai-voice-2.1"
+            ],
+            "contains": [],
+            "voiceOption": "voiceMicrosoft21",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "en-US-Harper:MAI-Voice-2.1"
+        },
+        "microsoft": {
+            "prefixes": [
+                "microsoft/"
+            ],
+            "contains": [
+                "mai-voice"
+            ],
+            "voiceOption": "voiceMicrosoft",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "en-US-Harper:MAI-Voice-2"
+        },
+        "grok": {
+            "prefixes": [
+                "x-ai/"
+            ],
+            "contains": [
+                "grok-voice"
+            ],
+            "voiceOption": "voiceGrok",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "eve"
+        },
+        "sesame": {
+            "prefixes": [
+                "sesame/"
+            ],
+            "contains": [
+                "csm-1b"
+            ],
+            "voiceOption": "voiceSesame",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "conversational_a"
+        },
+        "orpheus": {
+            "prefixes": [
+                "canopylabs/"
+            ],
+            "contains": [
+                "orpheus"
+            ],
+            "voiceOption": "voiceOrpheus",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "tara"
+        },
+        "kokoro": {
+            "prefixes": [
+                "hexgrad/"
+            ],
+            "contains": [
+                "kokoro"
+            ],
+            "voiceOption": "voiceKokoro",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "af_heart"
+        },
+        "voxtral": {
+            "prefixes": [
+                "mistralai/"
+            ],
+            "contains": [
+                "voxtral"
+            ],
+            "voiceOption": "voiceVoxtral",
+            "optionalVoice": false,
+            "defaultFormat": "mp3",
+            "formats": [
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "en_paul_neutral"
+        },
+        "deepgramflux": {
+            "prefixes": [
+                "deepgram/flux"
+            ],
+            "contains": [
+                "flux-tts"
+            ],
+            "voiceOption": "voiceDeepgramFlux",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "flux-haley-en"
+        },
+        "deepgram": {
+            "prefixes": [
+                "deepgram/"
+            ],
+            "contains": [
+                "aura-2"
+            ],
+            "voiceOption": "voiceDeepgram",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "aura-2-thalia-en"
+        },
+        "minimax": {
+            "prefixes": [
+                "minimax/"
+            ],
+            "contains": [
+                "speech-2.8"
+            ],
+            "voiceOption": "voiceMiniMax",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "English_expressive_narrator"
+        },
+        "fishaudio": {
+            "prefixes": [
+                "fish-audio/"
+            ],
+            "contains": [
+                "fish"
+            ],
+            "voiceOption": "voiceFishAudio",
+            "optionalVoice": true,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 44100,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "default"
+        },
+        "qwenplus": {
+            "prefixes": [
+                "qwen/"
+            ],
+            "contains": [
+                "qwen-audio"
+            ],
+            "voiceOption": "voiceQwenPlus",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "requiresContains": [
+                "plus"
+            ],
+            "defaultVoice": "longanlingxin"
+        },
+        "qwenflash": {
+            "prefixes": [
+                "qwen/"
+            ],
+            "contains": [
+                "qwen-audio"
+            ],
+            "voiceOption": "voiceQwenFlash",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 4096,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "loongjohn"
+        },
+        "seed": {
+            "prefixes": [
+                "bytedance-seed/seed-audio"
+            ],
+            "contains": [
+                "seed-audio"
+            ],
+            "voiceOption": "",
+            "optionalVoice": true,
+            "defaultFormat": "mp3",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 3000,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": ""
+        }
+    },
+    "models": {
+        "google/gemini-3.1-flash-tts-preview": {
+            "family": "gemini"
+        },
+        "google/gemini-3.8-flash-tts": {
+            "family": "gemini",
+            "instructionsMode": "googleStyle"
+        },
+        "google/gemini-3.8-flash-lite-tts": {
+            "family": "gemini",
+            "instructionsMode": "googleStyle"
+        },
+        "microsoft/mai-voice-2": {
+            "family": "microsoft"
+        },
+        "microsoft/mai-voice-2-flash": {
+            "family": "microsoft"
+        },
+        "microsoft/mai-voice-2.1": {
+            "family": "microsoft21"
+        },
+        "microsoft/mai-voice-2.1-flash": {
+            "family": "microsoft21flash"
+        },
+        "x-ai/grok-voice-tts-1.0": {
+            "family": "grok"
+        },
+        "sesame/csm-1b": {
+            "family": "sesame"
+        },
+        "canopylabs/orpheus-3b-0.1-ft": {
+            "family": "orpheus"
+        },
+        "hexgrad/kokoro-82m": {
+            "family": "kokoro"
+        },
+        "mistralai/voxtral-mini-tts-2603": {
+            "family": "voxtral"
+        },
+        "deepgram/aura-2": {
+            "family": "deepgram"
+        },
+        "deepgram/flux-tts:free": {
+            "family": "deepgramflux"
+        },
+        "minimax/speech-2.8-hd": {
+            "family": "minimax"
+        },
+        "minimax/speech-2.8-turbo": {
+            "family": "minimax"
+        },
+        "fish-audio/s1": {
+            "family": "fishaudio"
+        },
+        "fish-audio/s2-pro": {
+            "family": "fishaudio"
+        },
+        "fish-audio/s2.1-pro": {
+            "family": "fishaudio"
+        },
+        "fish-audio/s2.1-pro-free:free": {
+            "family": "fishaudio"
+        },
+        "qwen/qwen-audio-3.0-tts-flash": {
+            "family": "qwenflash"
+        },
+        "qwen/qwen-audio-3.0-tts-plus": {
+            "family": "qwenplus"
+        },
+        "bytedance-seed/seed-audio-1-0": {
+            "family": "seed"
+        }
+    }
 };
-var DEFAULT_VOICE_BY_FAMILY = {
-    gemini: 'Kore',
-    microsoft: 'en-US-Harper:MAI-Voice-2',
-    grok: 'eve',
-    sesame: 'conversational_a',
-    orpheus: 'tara',
-    kokoro: 'af_heart',
-    voxtral: 'en_paul_neutral',
-    deepgram: 'aura-2-thalia-en',
-    deepgramflux: 'flux-haley-en',
-    qwenflash: 'loongjohn',
-    qwenplus: 'longanlingxin',
-    fishaudio: 'default'
-};
+var VOICE_OPTION_BY_FAMILY = {};
+var DEFAULT_VOICE_BY_FAMILY = {};
+var PCM_SAMPLE_RATE_BY_FAMILY = {};
+Object.keys(MODEL_CATALOG.families).forEach(function(family) {
+    var profile = MODEL_CATALOG.families[family];
+    VOICE_OPTION_BY_FAMILY[family] = profile.voiceOption || undefined;
+    DEFAULT_VOICE_BY_FAMILY[family] = profile.defaultVoice;
+    PCM_SAMPLE_RATE_BY_FAMILY[family] = profile.pcmSampleRate;
+});
+// END GENERATED MODEL CATALOG
+var PENDING_TTS_REQUESTS = {};
 var AUDIO_CACHE = {};
 var AUDIO_CACHE_ORDER = [];
 var CACHE_API_KEY_DIGEST = null;
@@ -131,88 +554,74 @@ function getModel() {
 
 function getModelFamily(model) {
     var value = String(model || '').toLowerCase();
-
-    if (value.indexOf('gemini') !== -1) {
-        return 'gemini';
+    var known = MODEL_CATALOG.models[value];
+    if (known) {
+        return known.family;
     }
-    if (value.indexOf('microsoft/') === 0 || value.indexOf('mai-voice') !== -1) {
-        return 'microsoft';
+    var families = Object.keys(MODEL_CATALOG.families);
+    for (var i = 0; i < families.length; i++) {
+        var family = families[i];
+        var profile = MODEL_CATALOG.families[family];
+        var matched = profile.prefixes.some(function(prefix) { return value.indexOf(prefix) === 0; }) ||
+            profile.contains.some(function(fragment) { return value.indexOf(fragment) !== -1; });
+        if (matched && (!profile.requiresContains || profile.requiresContains.every(function(fragment) {
+            return value.indexOf(fragment) !== -1;
+        }))) {
+            return family;
+        }
     }
-    if (value.indexOf('x-ai/') === 0 || value.indexOf('grok-voice') !== -1) {
-        return 'grok';
-    }
-    if (value.indexOf('sesame/') === 0 || value.indexOf('csm-1b') !== -1) {
-        return 'sesame';
-    }
-    if (value.indexOf('canopylabs/') === 0 || value.indexOf('orpheus') !== -1) {
-        return 'orpheus';
-    }
-    if (value.indexOf('hexgrad/') === 0 || value.indexOf('kokoro') !== -1) {
-        return 'kokoro';
-    }
-    if (value.indexOf('mistralai/') === 0 || value.indexOf('voxtral') !== -1) {
-        return 'voxtral';
-    }
-    // Flux TTS 先于通用 deepgram 前缀判断，避免落入 Aura-2 音色菜单。
-    if (value.indexOf('deepgram/flux') === 0 || value.indexOf('flux-tts') !== -1) {
-        return 'deepgramflux';
-    }
-    if (value.indexOf('deepgram/') === 0 || value.indexOf('aura-2') !== -1) {
-        return 'deepgram';
-    }
-    if (value.indexOf('minimax/') === 0 || value.indexOf('speech-2.8') !== -1) {
-        return 'minimax';
-    }
-    if (value.indexOf('fish-audio/') === 0 || value.indexOf('fish') !== -1) {
-        return 'fishaudio';
-    }
-    if (value.indexOf('qwen/') === 0 || value.indexOf('qwen-audio') !== -1) {
-        return value.indexOf('plus') !== -1 ? 'qwenplus' : 'qwenflash';
-    }
-
     return 'custom';
 }
 
-function getVoice() {
-    var family = getModelFamily(getModel());
-    var customVoice = readOption('customVoice');
+function getModelProfile(model) {
+    var value = String(model || getModel()).toLowerCase();
+    var family = getModelFamily(value);
+    var defaults = MODEL_CATALOG.families[family] || {
+        optionalVoice: false,
+        defaultFormat: 'pcm',
+        formats: null,
+        pcmSampleRate: 24000,
+        maxInputChars: MAX_TEXT_LENGTH,
+        speedRange: [0.5, 2.0],
+        instructionsMode: 'prefix'
+    };
+    var profile = { family: family };
+    Object.keys(defaults).forEach(function(key) { profile[key] = defaults[key]; });
+    var modelProfile = MODEL_CATALOG.models[value] || {};
+    Object.keys(modelProfile).forEach(function(key) { profile[key] = modelProfile[key]; });
+    return profile;
+}
 
+function getVoice() {
+    var profile = getModelProfile(getModel());
+    var customVoice = readOption('customVoice');
     if (customVoice) {
         return customVoice;
     }
-
-    if (family === 'minimax' || family === 'custom') {
-        return '';
-    }
-
-    var voice = readOption(VOICE_OPTION_BY_FAMILY[family]) || DEFAULT_VOICE_BY_FAMILY[family];
-    if (family === 'fishaudio' && voice === 'default') {
-        return '';
-    }
-    return voice;
+    var voice = profile.voiceOption ? readOption(profile.voiceOption) || profile.defaultVoice : '';
+    return profile.optionalVoice && voice === 'default' ? '' : voice;
 }
 
 function getResponseFormat() {
-    return readOption('responseFormat') || 'pcm';
+    var format = readOption('responseFormat') || 'auto';
+    return format === 'auto' ? getModelProfile(getModel()).defaultFormat : format;
 }
 
 function getSpeed() {
-    var speed = parseFloat(readOption('speed'));
-    return isNaN(speed) ? 1.0 : speed;
+    var value = readOption('speed');
+    return value ? Number(value) : 1.0;
 }
 
-// 裸 PCM 包装 WAV 时各家族的实际输出采样率；未列出的家族按 24 kHz。
-var PCM_SAMPLE_RATE_BY_FAMILY = {
-    fishaudio: 44100
-};
-
 function getSampleRate() {
-    var rate = parseInt(readOption('pcmSampleRate'), 10);
-    if (rate > 0) {
-        return rate;
-    }
-    var family = getModelFamily(getModel());
-    return PCM_SAMPLE_RATE_BY_FAMILY[family] || 24000;
+    var value = readOption('pcmSampleRate');
+    return value && value !== 'auto' ? Number(value) : getModelProfile(getModel()).pcmSampleRate;
+}
+
+function isOpenRouterSpeechApi() {
+    var url = getApiUrl();
+    var urlInfo = getUrlSchemeAndHost(url);
+    return urlInfo && (urlInfo.host === 'openrouter.ai' || /\.openrouter\.ai$/.test(urlInfo.host)) &&
+        /\/audio\/speech$/i.test(splitUrlSuffix(url).path);
 }
 
 function isOpenRouterBaseUrl(base) {
@@ -366,18 +775,32 @@ function validateOptions() {
     if (!getModel()) {
         return { type: 'param', message: '请先填写 OpenRouter TTS 模型 ID。' };
     }
-    if (!getVoice()) {
-        var family = getModelFamily(getModel());
-        if (family === 'custom' || family === 'minimax') {
-            return { type: 'param', message: '当前模型无预设音色，请先在 Custom Voice 中填写音色 ID。' };
-        }
-        if (family !== 'fishaudio') {
-            return { type: 'param', message: '请先在插件设置中选择音色。' };
-        }
+    var profile = getModelProfile(getModel());
+    if (!getVoice() && !profile.optionalVoice) {
+        return { type: 'param', message: profile.family === 'custom'
+            ? '当前模型无预设音色，请先在 Custom Voice 中填写音色 ID。'
+            : '请先在插件设置中选择音色。' };
     }
     var apiUrlError = validateApiUrl();
     if (apiUrlError) {
         return apiUrlError;
+    }
+    var format = getResponseFormat();
+    if (['pcm', 'mp3', 'wav', 'opus', 'flac'].indexOf(format) === -1) {
+        return { type: 'param', message: 'Audio Format 无效，请重新选择音频格式。' };
+    }
+    if (isOpenRouterSpeechApi() && (['pcm', 'mp3'].indexOf(format) === -1 ||
+        (profile.formats && profile.formats.indexOf(format) === -1))) {
+        return { type: 'param', message: '当前模型不支持 ' + format + ' 格式，请选择 Auto 或 ' +
+            (profile.formats || ['pcm', 'mp3']).join(' / ') + '。' };
+    }
+    var speed = getSpeed();
+    if (!isFinite(speed) || speed < profile.speedRange[0] || speed > profile.speedRange[1]) {
+        return { type: 'param', message: 'Speed 必须在 ' + profile.speedRange[0] + 'x ~ ' + profile.speedRange[1] + 'x 之间。' };
+    }
+    var sampleRate = getSampleRate();
+    if (!isFinite(sampleRate) || sampleRate < 1000 || sampleRate > 384000 || Math.floor(sampleRate) !== sampleRate) {
+        return { type: 'param', message: 'PCM Sample Rate 无效，请选择 Auto 或有效的采样率。' };
     }
     return null;
 }
@@ -801,16 +1224,50 @@ function writeString(view, offset, str) {
     }
 }
 
-function createWavHeaderBytes(pcmLen, sampleRate) {
+function resolvePcmMetadata(mimeType, fallbackRate) {
+    var parameters = {};
+    String(mimeType || '').split(';').slice(1).forEach(function(part) {
+        var match = /^\s*(rate|channels)\s*=\s*(?:"([^"]*)"|([^\s]+))\s*$/i.exec(part);
+        if (match) {
+            var value = match[2] === undefined ? match[3] : match[2];
+            if (!/^\d+$/.test(value)) {
+                throw new Error('PCM ' + match[1] + ' 参数无效');
+            }
+            var name = match[1].toLowerCase();
+            if (parameters[name] !== undefined && parameters[name] !== Number(value)) {
+                throw new Error('PCM ' + name + ' 参数冲突');
+            }
+            parameters[name] = Number(value);
+        } else if (/^\s*(rate|channels)\s*=/i.test(part)) {
+            throw new Error('PCM 元数据无效');
+        }
+    });
+    var rateOption = readOption('pcmSampleRate');
+    var manualRate = rateOption && rateOption !== 'auto';
+    var rate = manualRate ? fallbackRate : parameters.rate === undefined ? fallbackRate : parameters.rate;
+    var channels = parameters.channels === undefined ? 1 : parameters.channels;
+    if (!isFinite(rate) || rate < 1000 || rate > 384000 || Math.floor(rate) !== rate ||
+        !isFinite(channels) || channels < 1 || channels > 32 || Math.floor(channels) !== channels) {
+        throw new Error('PCM 采样率或声道数无效');
+    }
+    return { sampleRate: rate, channels: channels };
+}
+
+function createWavHeaderBytes(pcmLen, sampleRate, numChannels) {
     sampleRate = sampleRate || 24000;
-    var numChannels = 1;
+    numChannels = numChannels || 1;
     var bitsPerSample = 16;
-    var byteRate = sampleRate * numChannels * (bitsPerSample / 8);
     var blockAlign = numChannels * (bitsPerSample / 8);
+    if (!isFinite(pcmLen) || pcmLen < 0 || Math.floor(pcmLen) !== pcmLen || pcmLen % 2 !== 0) {
+        throw new Error('16-bit PCM 音频字节数必须为偶数');
+    }
+    if (pcmLen % blockAlign !== 0) {
+        throw new Error('PCM 音频包含不完整的多声道采样帧');
+    }
+    var byteRate = sampleRate * blockAlign;
     var wavLen = 44 + pcmLen;
     var buffer = new ArrayBuffer(44);
     var view = new DataView(buffer);
-
     writeString(view, 0, 'RIFF');
     view.setUint32(4, wavLen - 8, true);
     writeString(view, 8, 'WAVE');
@@ -824,24 +1281,15 @@ function createWavHeaderBytes(pcmLen, sampleRate) {
     view.setUint16(34, bitsPerSample, true);
     writeString(view, 36, 'data');
     view.setUint32(40, pcmLen, true);
-
     return new Uint8Array(buffer);
 }
 
-function pcmToWav(pcmBase64, sampleRate) {
+function pcmToWav(pcmBase64, sampleRate, channels) {
     var pcmData = base64Decode(pcmBase64);
-    var pcmLen = pcmData.length;
-    if (pcmLen % 2 !== 0) {
-        throw new Error('16-bit PCM 音频字节数必须为偶数');
-    }
-    var wavLen = 44 + pcmLen;
-    var headerBytes = createWavHeaderBytes(pcmLen, sampleRate);
-    var buffer = new ArrayBuffer(wavLen);
-
-    var wavBytes = new Uint8Array(buffer);
+    var headerBytes = createWavHeaderBytes(pcmData.length, sampleRate, channels);
+    var wavBytes = new Uint8Array(44 + pcmData.length);
     wavBytes.set(headerBytes, 0);
     wavBytes.set(pcmData, 44);
-
     return base64Encode(wavBytes);
 }
 
@@ -851,13 +1299,13 @@ function canUseNativeDataAudioProcessing() {
         typeof $data.fromBase64 === 'function';
 }
 
-function pcmDataToWavBase64(pcmData, sampleRate, knownLength) {
+function pcmDataToWavBase64(pcmData, sampleRate, knownLength, channels) {
     var pcmLength = getDataLength(pcmData, knownLength);
     if (!canUseNativeDataAudioProcessing() || pcmLength < 0) {
         return '';
     }
 
-    var headerBytes = createWavHeaderBytes(pcmLength, sampleRate);
+    var headerBytes = createWavHeaderBytes(pcmLength, sampleRate, channels);
     var headerArray = [];
     for (var i = 0; i < headerBytes.length; i++) {
         headerArray.push(headerBytes[i]);
@@ -867,19 +1315,15 @@ function pcmDataToWavBase64(pcmData, sampleRate, knownLength) {
     return wavData.toBase64();
 }
 
-function pcmBase64ToWavNative(base64, sampleRate) {
+function pcmBase64ToWavNative(base64, sampleRate, channels) {
     if (!canUseNativeDataAudioProcessing()) {
         return '';
     }
-    try {
-        var str = String(base64 || '');
-        var start = getBase64PayloadStart(str);
-        var payload = start ? str.substring(start) : str;
-        var pcmData = $data.fromBase64(payload);
-        return pcmDataToWavBase64(pcmData, sampleRate, base64DecodedByteLength(payload));
-    } catch (e) {
-        return '';
-    }
+    var str = String(base64 || '');
+    var start = getBase64PayloadStart(str);
+    var payload = start ? str.substring(start) : str;
+    var pcmData = $data.fromBase64(payload);
+    return pcmDataToWavBase64(pcmData, sampleRate, base64DecodedByteLength(payload), channels);
 }
 
 function buildInputText(text, instructions) {
@@ -899,6 +1343,34 @@ function buildSpeechRequestBody(inputText, model, voice, format, speed) {
         body.speed = speed;
     }
     return body;
+}
+
+function getConfiguredSpeechRequest(text) {
+    var error = validateOptions();
+    if (error) {
+        return { error: error };
+    }
+    text = text == null ? '' : String(text).trim();
+    if (!text) {
+        return { error: { type: 'param', message: '待合成文本不能为空。' } };
+    }
+    var model = getModel();
+    var profile = getModelProfile(model);
+    var instructions = readOption('instructions');
+    var inputText = profile.instructionsMode === 'googleStyle' ? text : buildInputText(text, instructions);
+    if (inputText.length > profile.maxInputChars || instructions.length > MAX_TEXT_LENGTH) {
+        return { error: { type: 'param', message: '文本与 Instructions 超出 ' + profile.maxInputChars + ' 字符限制。' } };
+    }
+    var config = {
+        apiKey: readOption('apiKey'), apiUrl: getApiUrl(), model: model,
+        voice: getVoice(), format: getResponseFormat(), speed: getSpeed(),
+        sampleRate: getSampleRate(), instructions: instructions, text: text, inputText: inputText
+    };
+    config.body = buildSpeechRequestBody(inputText, model, config.voice, config.format, config.speed);
+    if (instructions && profile.instructionsMode === 'googleStyle') {
+        config.body.provider = { options: { 'google-ai-studio': { speech_metadata: { style: instructions } } } };
+    }
+    return config;
 }
 
 function getApiErrorMessage(resp) {
@@ -1161,12 +1633,11 @@ function parsePossibleJsonData(rawData, knownLength) {
         index += 1;
     }
 
-    if (index >= length || (index >= scanLimit && scanLimit < length)) {
-        return { matched: true, data: null };
-    }
+    // 空白字节也可能是合法 PCM；扫描窗口耗尽不能证明响应是 JSON。
+    var whitespacePrefix = index >= scanLimit;
 
     var firstByte = index < length ? rawData.readUInt8(index) : -1;
-    var startsLikeJson = firstByte === 0x7B || firstByte === 0x5B || firstByte === 0x22 ||
+    var startsLikeJson = whitespacePrefix || firstByte === 0x7B || firstByte === 0x5B || firstByte === 0x22 ||
         firstByte === 0x6E || firstByte === 0x74 || firstByte === 0x66 || firstByte === 0x2D ||
         (firstByte >= 0x30 && firstByte <= 0x39);
     if (!startsLikeJson) {
@@ -1613,11 +2084,12 @@ function processAudioBase64(audioBase64, format, mimeType, sampleRate) {
         if (base64DecodedByteLength(audioBase64) % 2 !== 0) {
             throw new Error('16-bit PCM 音频字节数必须为偶数');
         }
-        var nativeWavBase64 = pcmBase64ToWavNative(audioBase64, sampleRate);
+        var metadata = resolvePcmMetadata(mimeType, sampleRate);
+        var nativeWavBase64 = pcmBase64ToWavNative(audioBase64, metadata.sampleRate, metadata.channels);
         if (nativeWavBase64) {
             return { value: nativeWavBase64, outputFormat: 'wav' };
         }
-        return { value: pcmToWav(audioBase64, sampleRate), outputFormat: 'wav' };
+        return { value: pcmToWav(audioBase64, metadata.sampleRate, metadata.channels), outputFormat: 'wav' };
     }
 
     return { value: audioBase64, outputFormat: format || 'audio' };
@@ -1659,11 +2131,12 @@ function processAudioData(rawData, format, mimeType, sampleRate, knownLength) {
         if (rawDataLength % 2 !== 0) {
             throw new Error('16-bit PCM 音频字节数必须为偶数');
         }
-        var nativeWavBase64 = pcmDataToWavBase64(rawData, sampleRate, rawDataLength);
+        var metadata = resolvePcmMetadata(mimeType, sampleRate);
+        var nativeWavBase64 = pcmDataToWavBase64(rawData, metadata.sampleRate, rawDataLength, metadata.channels);
         if (nativeWavBase64) {
             return { value: nativeWavBase64, outputFormat: 'wav' };
         }
-        return { value: pcmToWav(rawData.toBase64(), sampleRate), outputFormat: 'wav' };
+        return { value: pcmToWav(rawData.toBase64(), metadata.sampleRate, metadata.channels), outputFormat: 'wav' };
     }
 
     return { value: rawData.toBase64(), outputFormat: format || 'audio' };
@@ -1691,18 +2164,17 @@ function createStreamUnsupportedError() {
 }
 
 function pluginValidate(completion) {
-    var error = validateOptions();
-    if (error) {
-        completion({ result: false, error: error });
+    var config = getConfiguredSpeechRequest('Hi');
+    if (config.error) {
+        completion({ result: false, error: config.error });
         return;
     }
-
-    var apiKey = readOption('apiKey');
-    var model = getModel();
-    var voice = getVoice();
-    var apiUrl = getApiUrl();
-    var format = getResponseFormat();
-    var sampleRate = getSampleRate();
+    var apiKey = config.apiKey;
+    var model = config.model;
+    var voice = config.voice;
+    var apiUrl = config.apiUrl;
+    var format = config.format;
+    var sampleRate = config.sampleRate;
 
     requestSpeechResponse({
         method: 'POST',
@@ -1711,7 +2183,7 @@ function pluginValidate(completion) {
             Authorization: 'Bearer ' + apiKey,
             'Content-Type': 'application/json'
         },
-        body: buildSpeechRequestBody('Hi', model, voice, format, 1.0),
+        body: config.body,
         timeout: VALIDATION_TIMEOUT_INTERVAL
     }, function(resp) {
         if (resp.streamUnsupported) {
@@ -1766,46 +2238,21 @@ function pluginValidate(completion) {
 }
 
 function tts(query, completion) {
-    var validationError = validateOptions();
-    if (validationError) {
-        completion({ error: validationError });
+    var config = getConfiguredSpeechRequest(query && query.text);
+    if (config.error) {
+        completion({ error: config.error });
         return;
     }
-
-    if (!query || !query.text || !String(query.text).trim()) {
-        completion({ error: { type: 'param', message: '待合成文本不能为空。' } });
-        return;
-    }
-
-    var text = String(query.text).trim();
-    if (text.length > MAX_TEXT_LENGTH) {
-        completion({
-            error: {
-                type: 'param',
-                message: '文本超出 ' + MAX_TEXT_LENGTH + ' 字符限制（当前 ' + text.length + ' 字符）。'
-            }
-        });
-        return;
-    }
-
-    var apiKey = readOption('apiKey');
-    var model = getModel();
-    var voice = getVoice();
-    var format = getResponseFormat();
-    var speed = getSpeed();
-    var sampleRate = getSampleRate();
-    var instructions = readOption('instructions');
-    var inputText = buildInputText(text, instructions);
-    if (inputText.length > MAX_TEXT_LENGTH) {
-        completion({
-            error: {
-                type: 'param',
-                message: '文本与 Instructions 合并后超出 ' + MAX_TEXT_LENGTH + ' 字符限制（当前 ' + inputText.length + ' 字符）。'
-            }
-        });
-        return;
-    }
-    var apiUrl = getApiUrl();
+    var apiKey = config.apiKey;
+    var model = config.model;
+    var voice = config.voice;
+    var format = config.format;
+    var speed = config.speed;
+    var sampleRate = config.sampleRate;
+    var instructions = config.instructions;
+    var text = config.text;
+    var inputText = config.inputText;
+    var apiUrl = config.apiUrl;
     var requestId = nextRequestId();
     var requestStartedAt = nowMs();
     var apiKeyCacheScope = getApiKeyCacheScope(apiKey);
@@ -1844,6 +2291,40 @@ function tts(query, completion) {
         return;
     }
 
+    var pendingKey = apiKeyCacheGeneration + ':' + cacheKey;
+    var pending = PENDING_TTS_REQUESTS[pendingKey];
+    if (pending) {
+        pending.completions.push(completion);
+        logTtsInfo(requestId, 'request_shared', 'listeners=' + pending.completions.length);
+        return;
+    }
+    pending = { completions: [completion] };
+    PENDING_TTS_REQUESTS[pendingKey] = pending;
+    function finishTts(outcome) {
+        if (PENDING_TTS_REQUESTS[pendingKey] === pending) {
+            delete PENDING_TTS_REQUESTS[pendingKey];
+        }
+        var completions = pending.completions;
+        pending.completions = [];
+        completions.forEach(function(callback) {
+            var output;
+            if (outcome.result) {
+                var result = outcome.result;
+                output = { result: createTtsResult(result.value, result.raw.model, result.raw.voice,
+                    result.raw.format, result.raw.sourceFormat, result.raw.cache) };
+            } else {
+                var error = {};
+                Object.keys(outcome.error).forEach(function(key) { error[key] = outcome.error[key]; });
+                output = { error: error };
+            }
+            try {
+                callback(output);
+            } catch (e) {
+                logTtsError(requestId, 'completion_error', 'caller_callback_failed');
+            }
+        });
+    }
+
     logTtsInfo(
         requestId,
         'start',
@@ -1863,85 +2344,85 @@ function tts(query, completion) {
             Authorization: 'Bearer ' + apiKey,
             'Content-Type': 'application/json'
         },
-        body: buildSpeechRequestBody(inputText, model, voice, format, speed),
+        body: config.body,
         timeout: TTS_REQUEST_TIMEOUT_INTERVAL
     }, function(resp) {
-            var requestElapsedMs = nowMs() - requestStartedAt;
+        var requestElapsedMs = nowMs() - requestStartedAt;
 
-            if (resp.streamUnsupported) {
-                logTtsError(requestId, 'stream_unsupported', 'request_ms=' + requestElapsedMs);
-                completion({ error: createStreamUnsupportedError() });
-                return;
-            }
-            if (resp.audioTooLarge) {
+        if (resp.streamUnsupported) {
+            logTtsError(requestId, 'stream_unsupported', 'request_ms=' + requestElapsedMs);
+            finishTts({ error: createStreamUnsupportedError() });
+            return;
+        }
+        if (resp.audioTooLarge) {
+            logTtsError(requestId, 'response_too_large', 'request_ms=' + requestElapsedMs + ' limit_bytes=' + MAX_AUDIO_BYTES);
+            finishTts({ error: createAudioTooLargeError() });
+            return;
+        }
+        if (resp.streamProcessingError) {
+            logTtsError(requestId, 'stream_processing_error', 'request_ms=' + requestElapsedMs + ' message=' + sanitizeLogValue(resp.streamProcessingError.message || resp.streamProcessingError));
+            finishTts({ error: { type: 'api', message: '音频响应处理失败。' } });
+            return;
+        }
+        if (resp.error) {
+            logTtsError(requestId, 'network_error', 'request_ms=' + requestElapsedMs);
+            finishTts({ error: toServiceError(resp.error) });
+            return;
+        }
+
+        var statusCode = resp.response ? resp.response.statusCode : 0;
+        if (statusCode && (statusCode < 200 || statusCode >= 300)) {
+            var httpError = parseHttpError(resp);
+            logTtsError(requestId, 'http_error', 'request_ms=' + requestElapsedMs + ' status=' + statusCode);
+            finishTts({ error: httpError });
+            return;
+        }
+
+        try {
+            var audioPayload = getAudioPayload(resp);
+            if (audioPayload && audioPayload.tooLarge) {
                 logTtsError(requestId, 'response_too_large', 'request_ms=' + requestElapsedMs + ' limit_bytes=' + MAX_AUDIO_BYTES);
-                completion({ error: createAudioTooLargeError() });
-                return;
-            }
-            if (resp.streamProcessingError) {
-                logTtsError(requestId, 'stream_processing_error', 'request_ms=' + requestElapsedMs + ' message=' + sanitizeLogValue(resp.streamProcessingError.message || resp.streamProcessingError));
-                completion({ error: { type: 'api', message: '音频响应处理失败。' } });
-                return;
-            }
-            if (resp.error) {
-                logTtsError(requestId, 'network_error', 'request_ms=' + requestElapsedMs);
-                completion({ error: toServiceError(resp.error) });
+                finishTts({ error: createAudioTooLargeError() });
                 return;
             }
 
-            var statusCode = resp.response ? resp.response.statusCode : 0;
-            if (statusCode && (statusCode < 200 || statusCode >= 300)) {
-                var httpError = parseHttpError(resp);
-                logTtsError(requestId, 'http_error', 'request_ms=' + requestElapsedMs + ' status=' + statusCode);
-                completion({ error: httpError });
+            if (!audioPayload || (!audioPayload.data && !audioPayload.rawData)) {
+                logTtsError(requestId, 'invalid_response', 'request_ms=' + requestElapsedMs + ' reason=missing_audio_data');
+                finishTts({ error: { type: 'api', message: 'OpenRouter TTS 服务没有返回音频数据。' } });
                 return;
             }
 
-            try {
-                var audioPayload = getAudioPayload(resp);
-                if (audioPayload && audioPayload.tooLarge) {
-                    logTtsError(requestId, 'response_too_large', 'request_ms=' + requestElapsedMs + ' limit_bytes=' + MAX_AUDIO_BYTES);
-                    completion({ error: createAudioTooLargeError() });
-                    return;
-                }
+            var convertStartedAt = nowMs();
+            var sourceSizeLog = audioPayload.rawData
+                ? ' source_bytes=' + getDataLength(audioPayload.rawData, audioPayload.byteLength)
+                : ' source_base64_chars=' + audioPayload.data.length;
+            var processed = processAudioPayload(audioPayload, format, sampleRate);
+            audioPayload.rawData = null;
+            var convertElapsedMs = nowMs() - convertStartedAt;
+            var totalElapsedMs = nowMs() - requestStartedAt;
+            var result = createTtsResult(processed.value, model, voice, processed.outputFormat, audioPayload.mimeType || format, 'miss');
+            var cacheStored = CACHE_API_KEY_GENERATION === apiKeyCacheGeneration &&
+                CACHE_API_KEY_DIGEST === apiKeyCacheScope &&
+                setCachedAudioResult(cacheKey, result);
 
-                if (!audioPayload || (!audioPayload.data && !audioPayload.rawData)) {
-                    logTtsError(requestId, 'invalid_response', 'request_ms=' + requestElapsedMs + ' reason=missing_audio_data');
-                    completion({ error: { type: 'api', message: 'OpenRouter TTS 服务没有返回音频数据。' } });
-                    return;
-                }
+            logTtsInfo(
+                requestId,
+                'success',
+                'status=' + statusCode +
+                ' request_ms=' + requestElapsedMs +
+                ' convert_ms=' + convertElapsedMs +
+                ' total_ms=' + totalElapsedMs +
+                ' cache_store=' + (cacheStored ? 'yes' : 'no') +
+                ' source=' + audioPayload.source +
+                ' source_mime=' + sanitizeLogValue(audioPayload.mimeType || 'unknown') +
+                sourceSizeLog +
+                ' output_base64_chars=' + processed.value.length
+            );
 
-                var convertStartedAt = nowMs();
-                var sourceSizeLog = audioPayload.rawData
-                    ? ' source_bytes=' + getDataLength(audioPayload.rawData, audioPayload.byteLength)
-                    : ' source_base64_chars=' + audioPayload.data.length;
-                var processed = processAudioPayload(audioPayload, format, sampleRate);
-                audioPayload.rawData = null;
-                var convertElapsedMs = nowMs() - convertStartedAt;
-                var totalElapsedMs = nowMs() - requestStartedAt;
-                var result = createTtsResult(processed.value, model, voice, processed.outputFormat, audioPayload.mimeType || format, 'miss');
-                var cacheStored = CACHE_API_KEY_GENERATION === apiKeyCacheGeneration &&
-                    CACHE_API_KEY_DIGEST === apiKeyCacheScope &&
-                    setCachedAudioResult(cacheKey, result);
-
-                logTtsInfo(
-                    requestId,
-                    'success',
-                    'status=' + statusCode +
-                    ' request_ms=' + requestElapsedMs +
-                    ' convert_ms=' + convertElapsedMs +
-                    ' total_ms=' + totalElapsedMs +
-                    ' cache_store=' + (cacheStored ? 'yes' : 'no') +
-                    ' source=' + audioPayload.source +
-                    ' source_mime=' + sanitizeLogValue(audioPayload.mimeType || 'unknown') +
-                    sourceSizeLog +
-                    ' output_base64_chars=' + processed.value.length
-                );
-
-                completion({ result: result });
-            } catch (e) {
-                logTtsError(requestId, 'processing_error', 'request_ms=' + requestElapsedMs + ' total_ms=' + (nowMs() - requestStartedAt) + ' message=' + sanitizeLogValue(e.message || e));
-                completion({ error: { type: 'api', message: '音频处理失败' } });
-            }
+            finishTts({ result: result });
+        } catch (e) {
+            logTtsError(requestId, 'processing_error', 'request_ms=' + requestElapsedMs + ' total_ms=' + (nowMs() - requestStartedAt) + ' message=' + sanitizeLogValue(e.message || e));
+            finishTts({ error: { type: 'api', message: '音频处理失败' } });
+        }
     });
 }

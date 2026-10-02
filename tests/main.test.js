@@ -40,7 +40,11 @@ class MockData {
         if (this.hooks.onUTF8) {
             this.hooks.onUTF8();
         }
-        return Buffer.from(this.bytes).toString('utf8');
+        try {
+            return new TextDecoder('utf-8', { fatal: true }).decode(this.bytes);
+        } catch {
+            return undefined;
+        }
     }
 
     readUInt8(index) {
@@ -446,14 +450,16 @@ test('info.json catalog stays consistent with the voice families in main.js', ()
     const byId = Object.fromEntries(info.options.map((option) => [option.identifier, option]));
     const plugin = createFallbackPlugin(options(), () => ({}));
     const modelIds = byId.model.menuValues.map((entry) => entry.value).filter((value) => value !== 'custom');
-    assert.equal(modelIds.length, 20);
+    const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'catalog.json'), 'utf8'));
+    assert.deepEqual(new Set(modelIds), new Set(catalog.models.map((model) => model.id)));
     assert.equal(new Set(modelIds).size, modelIds.length);
     for (const modelId of modelIds) {
         const family = plugin.context.getModelFamily(modelId);
         assert.notEqual(family, 'custom', `${modelId} should map to a known family`);
         const optionId = plugin.context.VOICE_OPTION_BY_FAMILY[family];
-        if (family === 'minimax') {
+        if (family === 'seed') {
             assert.equal(optionId, undefined);
+            assert.equal(plugin.context.getModelProfile(modelId).optionalVoice, true);
             continue;
         }
         assert.ok(byId[optionId], `${modelId} needs the ${optionId} menu`);
@@ -554,18 +560,20 @@ test('auto PCM sample rate follows the model family', () => {
     assert.equal(wavSampleRate(callTts(fishExplicit).result.value), 24000);
 });
 
-test('MiniMax still requires Custom Voice while Fish Audio does not', () => {
-    const minimax = createFallbackPlugin(options({ model: 'minimax/speech-2.8-hd' }), () => ({}));
-    const result = callTts(minimax);
-    assert.match(result.error.message, /Custom Voice/);
-    assert.equal(minimax.state.requests.length, 0);
-
-    const fish = createFallbackPlugin(options({ model: 'fish-audio/s2-pro' }), () => ({
-        rawData: new MockData(Buffer.from([1, 2, 3, 4])),
+test('MiniMax has menu defaults and Fish Audio can omit voice', () => {
+    const respond = () => ({
+        rawData: new MockData([0, 0, 0, 0]),
         response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
-    }));
-    const fishResult = callTts(fish);
-    assert.ok(fishResult.result);
+    });
+    const minimax = createFallbackPlugin(options({ model: 'minimax/speech-2.8-hd' }), respond);
+    assert.ok(callTts(minimax).result);
+    assert.equal(minimax.state.requests[0].body.voice, 'English_expressive_narrator');
+    const custom = createFallbackPlugin(options({ model: 'minimax/speech-2.8-turbo', customVoice: 'my-minimax-voice' }), respond);
+    callTts(custom);
+    assert.equal(custom.state.requests[0].body.voice, 'my-minimax-voice');
+    const fish = createFallbackPlugin(options({ model: 'fish-audio/s2-pro' }), respond);
+    assert.ok(callTts(fish).result);
+    assert.equal('voice' in fish.state.requests[0].body, false);
 });
 
 test('prefers inline audio over the JSON envelope rawData', () => {
@@ -1001,4 +1009,221 @@ test('streaming generic-MIME primitive JSON is never returned as audio', () => {
 
     const result = callTts(plugin);
     assert.match(result.error.message, /没有返回音频数据/);
+});
+
+test('Auto PCM preserves response sample rate, channel count and frame layout', () => {
+    const pcm = Buffer.alloc(16);
+    const plugin = createFallbackPlugin(options({ pcmSampleRate: 'auto' }), () => ({
+        rawData: new MockData(pcm),
+        response: { statusCode: 200, MIMEType: 'audio/pcm', headers: { 'Content-Type': 'audio/pcm;rate="48000";CHANNELS=2' } }
+    }));
+    const wav = Buffer.from(callTts(plugin).result.value, 'base64');
+    assert.equal(wav.readUInt32LE(24), 48000);
+    assert.equal(wav.readUInt16LE(22), 2);
+    assert.equal(wav.readUInt32LE(28), 192000);
+    assert.equal(wav.readUInt16LE(32), 4);
+    assert.deepEqual(wav.subarray(44), pcm);
+});
+
+test('manual PCM rate overrides response rate while retaining response channels', () => {
+    const plugin = createFallbackPlugin(options({ pcmSampleRate: '44100' }), () => ({
+        rawData: new MockData(Buffer.alloc(8)),
+        response: { statusCode: 200, headers: { 'Content-Type': 'audio/pcm; rate=48000; channels=2' } }
+    }));
+    const wav = Buffer.from(callTts(plugin).result.value, 'base64');
+    assert.equal(wav.readUInt32LE(24), 44100);
+    assert.equal(wav.readUInt16LE(22), 2);
+});
+
+test('inline PCM metadata works with native conversion and JavaScript fallback', () => {
+    const plugin = createFallbackPlugin(options({ pcmSampleRate: 'auto' }), () => ({}));
+    const base64 = Buffer.alloc(16).toString('base64');
+    for (const native of [true, false]) {
+        if (!native) plugin.context.$data = undefined;
+        const processed = plugin.context.processAudioBase64(base64, 'pcm', 'audio/pcm;rate=16000;channels=2', 24000);
+        const wav = Buffer.from(processed.value, 'base64');
+        assert.equal(wav.readUInt32LE(24), 16000);
+        assert.equal(wav.readUInt16LE(22), 2);
+        assert.equal(wav.readUInt16LE(32), 4);
+    }
+});
+
+test('malformed PCM metadata and incomplete multichannel frames are rejected', () => {
+    for (const mime of [
+        'audio/pcm;rate=0', 'audio/pcm;rate=NaN', 'audio/pcm;rate=999999',
+        'audio/pcm;channels=0', 'audio/pcm;channels=33', 'audio/pcm;channels=1.5',
+        'audio/pcm;rate=48000;rate=24000', 'audio/pcm;channels=2'
+    ]) {
+        const plugin = createFallbackPlugin(options({ pcmSampleRate: 'auto' }), () => ({
+            rawData: new MockData(Buffer.alloc(6)),
+            response: { statusCode: 200, headers: { 'Content-Type': mime } }
+        }));
+        assert.match(callTts(plugin).error.message, /音频处理失败/, mime);
+    }
+});
+
+test('PCM whitespace prefixes are retained while whitespace-prefixed JSON is rejected', () => {
+    for (const bytes of [Buffer.alloc(256, 0x20), Buffer.concat([Buffer.alloc(256, 0x20), Buffer.alloc(256)])]) {
+        const plugin = createFallbackPlugin(options(), () => ({
+            rawData: new MockData(bytes), response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        }));
+        const result = callTts(plugin);
+        assert.deepEqual(Buffer.from(result.result.value, 'base64').subarray(44), bytes);
+    }
+    for (const mime of ['audio/pcm', 'application/octet-stream', 'application/json']) {
+        const plugin = createFallbackPlugin(options(), () => ({
+            rawData: new MockData(Buffer.from(' '.repeat(300) + '{"error":{"message":"not audio"}}')),
+            response: { statusCode: 200, MIMEType: mime, headers: {} }
+        }));
+        assert.ok(callTts(plugin).error, mime);
+    }
+});
+
+test('Auto selects MP3 for Voxtral and rejects explicit PCM before requesting', () => {
+    const respond = () => ({ rawData: new MockData([0x49, 0x44, 0x33, 4, 0, 0, 0, 0, 0, 0]), response: { statusCode: 200, MIMEType: 'audio/mpeg', headers: {} } });
+    const auto = createFallbackPlugin(options({ model: 'mistralai/voxtral-mini-tts-2603', responseFormat: 'auto' }), respond);
+    assert.ok(callTts(auto).result);
+    assert.equal(auto.state.requests[0].body.response_format, 'mp3');
+    const invalid = createFallbackPlugin(options({ model: 'mistralai/voxtral-mini-tts-2603', responseFormat: 'pcm' }), respond);
+    assert.match(callTts(invalid).error.message, /Auto.*mp3/);
+    assert.equal(invalid.state.requests.length, 0);
+    assert.equal(callPluginValidate(invalid).result, false);
+});
+
+test('official API rejects custom-only formats and custom speech APIs retain them', () => {
+    const official = createFallbackPlugin(options({ responseFormat: 'wav' }), () => ({}));
+    assert.match(callTts(official).error.message, /不支持 wav/);
+    assert.equal(official.state.requests.length, 0);
+    const custom = createFallbackPlugin(options({ apiUrl: 'https://example.test/audio/speech', responseFormat: 'wav' }), () => ({
+        rawData: new MockData([0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x41, 0x56, 0x45]),
+        response: { statusCode: 200, MIMEType: 'audio/wav', headers: {} }
+    }));
+    assert.ok(callTts(custom).result);
+    assert.equal(custom.state.requests[0].body.response_format, 'wav');
+});
+
+test('Microsoft 2.1 and 2.1 Flash use distinct voices matching their model suffixes', () => {
+    for (const [model, family, suffix] of [
+        ['microsoft/mai-voice-2.1', 'microsoft21', ':MAI-Voice-2.1'],
+        ['microsoft/mai-voice-2.1-flash', 'microsoft21flash', ':MAI-Voice-2.1-Flash']
+    ]) {
+        const plugin = createFallbackPlugin(options({ model, responseFormat: 'auto' }), () => ({
+            rawData: new MockData([0, 0]), response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        }));
+        assert.equal(plugin.context.getModelFamily(model), family);
+        assert.ok(callTts(plugin).result);
+        assert.ok(plugin.state.requests[0].body.voice.endsWith(suffix));
+        assert.equal(plugin.state.requests[0].body.response_format, 'pcm');
+    }
+});
+
+test('Seed can omit voice, defaults to MP3 and enforces its shorter input limit', () => {
+    const plugin = createFallbackPlugin(options({ model: 'bytedance-seed/seed-audio-1-0', responseFormat: 'auto' }), () => ({
+        rawData: new MockData([0x49, 0x44, 0x33, 4, 0, 0, 0, 0, 0, 0]), response: { statusCode: 200, MIMEType: 'audio/mpeg', headers: {} }
+    }));
+    assert.ok(callTts(plugin).result);
+    assert.equal('voice' in plugin.state.requests[0].body, false);
+    assert.equal(plugin.state.requests[0].body.response_format, 'mp3');
+    assert.match(callTts(plugin, { text: 'a'.repeat(3001) }).error.message, /3000/);
+    assert.equal(plugin.state.requests.length, 1);
+});
+
+test('validation uses configured speed and Instructions with the same limits as TTS', () => {
+    const plugin = createFallbackPlugin(options({ speed: '1.5', instructions: '[excited]' }), () => ({
+        rawData: new MockData([0, 0]), response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    assert.equal(callPluginValidate(plugin).result, true);
+    assert.ok(callTts(plugin, { text: 'Hi' }).result);
+    assert.deepEqual(plugin.state.requests[0].body, plugin.state.requests[1].body);
+    assert.equal(plugin.state.requests[0].body.input, '[excited] Hi');
+    assert.equal(plugin.state.requests[0].body.speed, 1.5);
+    const overlong = createFallbackPlugin(options({ instructions: 'a'.repeat(4096) }), () => ({}));
+    assert.match(callPluginValidate(overlong).error.message, /4096/);
+    assert.equal(overlong.state.requests.length, 0);
+});
+
+test('Gemini 3.8 style instructions stay out of spoken text for validation and TTS', () => {
+    const plugin = createFallbackPlugin(options({ model: 'google/gemini-3.8-flash-tts', instructions: 'warm and friendly' }), () => ({
+        rawData: new MockData([0, 0]), response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    callPluginValidate(plugin);
+    callTts(plugin, { text: 'Hi' });
+    assert.deepEqual(plugin.state.requests[0].body, plugin.state.requests[1].body);
+    const body = plugin.state.requests[0].body;
+    assert.equal(body.input, 'Hi');
+    assert.equal(body.provider.options['google-ai-studio'].speech_metadata.style, 'warm and friendly');
+});
+
+test('invalid speed and sample rate configurations fail before any network request', () => {
+    for (const overrides of [{ speed: 'Infinity' }, { speed: '1.5junk' }, { speed: '0' }, { speed: '3' }, { pcmSampleRate: '24000junk' }]) {
+        const plugin = createFallbackPlugin(options(overrides), () => ({}));
+        assert.ok(callTts(plugin).error);
+        assert.equal(callPluginValidate(plugin).result, false);
+        assert.equal(plugin.state.requests.length, 0);
+    }
+});
+
+test('identical in-flight requests share one network call and get independent results', () => {
+    const plugin = createDeferredPlugin(options());
+    const results = [];
+    plugin.context.tts({ text: 'shared', lang: 'en' }, (output) => results.push(output));
+    plugin.context.tts({ text: 'shared', lang: 'en' }, (output) => results.push(output));
+    assert.equal(plugin.state.pending.length, 1);
+    completeDeferredRequest(plugin.state.pending[0], [0, 0, 0, 0]);
+    assert.equal(results.length, 2);
+    assert.equal(results[0].result.value, results[1].result.value);
+    assert.notEqual(results[0], results[1]);
+    assert.notEqual(results[0].result.raw, results[1].result.raw);
+    assert.equal(Object.keys(plugin.context.PENDING_TTS_REQUESTS).length, 0);
+    assert.equal(callTts(plugin, { text: 'shared' }).result.raw.cache, 'hit');
+});
+
+test('shared request failure notifies every caller, clears state and permits retry', () => {
+    const plugin = createDeferredPlugin(options());
+    const results = [];
+    for (let i = 0; i < 2; i++) plugin.context.tts({ text: 'retry me', lang: 'en' }, (output) => results.push(output));
+    plugin.state.pending[0].handler({ error: { message: 'network unavailable' } });
+    assert.equal(results.length, 2);
+    assert.equal(results[0].error.message, 'network unavailable');
+    assert.notEqual(results[0].error, results[1].error);
+    assert.equal(Object.keys(plugin.context.PENDING_TTS_REQUESTS).length, 0);
+    plugin.context.tts({ text: 'retry me', lang: 'en' }, (output) => results.push(output));
+    assert.equal(plugin.state.pending.length, 2);
+    completeDeferredRequest(plugin.state.pending[1], [0, 0]);
+    assert.ok(results[2].result);
+});
+
+test('changing effective request options prevents in-flight sharing', () => {
+    const settings = options();
+    const plugin = createDeferredPlugin(settings);
+    const results = [];
+    plugin.context.tts({ text: 'same', lang: 'en' }, (output) => results.push(output));
+    settings.speed = '1.5';
+    plugin.context.tts({ text: 'same', lang: 'en' }, (output) => results.push(output));
+    settings.instructions = '[excited]';
+    plugin.context.tts({ text: 'same', lang: 'en' }, (output) => results.push(output));
+    assert.equal(plugin.state.pending.length, 3);
+    for (const request of plugin.state.pending) completeDeferredRequest(request, [0, 0]);
+    assert.equal(results.length, 3);
+});
+
+test('one failing completion callback cannot prevent other shared callers completing', () => {
+    const plugin = createDeferredPlugin(options());
+    let result;
+    plugin.context.tts({ text: 'callbacks', lang: 'en' }, () => { throw new Error('caller failed'); });
+    plugin.context.tts({ text: 'callbacks', lang: 'en' }, (output) => { result = output; });
+    completeDeferredRequest(plugin.state.pending[0], [0, 0]);
+    assert.ok(result.result);
+    assert.equal(Object.keys(plugin.context.PENDING_TTS_REQUESTS).length, 0);
+});
+
+test('asynchronous stream callbacks deliver one shared result to both callers', async () => {
+    const plugin = createDeferredPlugin(options());
+    const outputs = [0, 1].map(() => new Promise((resolve) => plugin.context.tts({ text: 'async', lang: 'en' }, resolve)));
+    assert.equal(plugin.state.pending.length, 1);
+    await new Promise((resolve) => setImmediate(resolve));
+    completeDeferredRequest(plugin.state.pending[0], [0, 0]);
+    const results = await Promise.all(outputs);
+    assert.equal(results.length, 2);
+    assert.ok(results.every((output) => output.result));
 });

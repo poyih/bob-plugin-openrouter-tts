@@ -1,6 +1,6 @@
 {
   "identifier": "bob-plugin-openrouter-tts",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "category": "tts",
   "name": "OpenRouter TTS",
   "summary": "使用 OpenRouter TTS API 进行语音合成，覆盖全部 speech-output 模型。",
@@ -36,7 +36,7 @@
       "type": "menu",
       "title": "Model",
       "defaultValue": "google/gemini-3.1-flash-tts-preview",
-      "desc": "OpenRouter speech-output 模型。通常使用下方对应的 Voice 菜单；Custom Voice 非空时会全局覆盖菜单音色。MiniMax 模型请在 Custom Voice 填写音色 ID；Fish Audio 可留空使用默认音色，或在 Custom Voice 填写 reference ID。",
+      "desc": "选择模型及对应的 Voice 菜单。Custom Voice 非空时覆盖菜单；Fish Audio 和 Seed 可使用默认音色。",
       "menuValues": [
         {
           "title": "Gemini 3.1 Flash TTS Preview (Google)",
@@ -57,6 +57,14 @@
         {
           "title": "MAI-Voice-2-Flash (Microsoft)",
           "value": "microsoft/mai-voice-2-flash"
+        },
+        {
+          "title": "MAI-Voice-2.1 (Microsoft)",
+          "value": "microsoft/mai-voice-2.1"
+        },
+        {
+          "title": "MAI-Voice-2.1-Flash (Microsoft)",
+          "value": "microsoft/mai-voice-2.1-flash"
         },
         {
           "title": "Grok Voice TTS 1.0 (xAI)",
@@ -117,6 +125,10 @@
         {
           "title": "Qwen-Audio-3.0-TTS Plus (Qwen)",
           "value": "qwen/qwen-audio-3.0-tts-plus"
+        },
+        {
+          "title": "Seed Audio 1.0 (ByteDance)",
+          "value": "bytedance-seed/seed-audio-1-0"
         },
         {
           "title": "Custom Model ID",
@@ -261,6 +273,800 @@
         {
           "title": "Sulafat - Warm (温暖)",
           "value": "Sulafat"
+        }
+      ]
+    },
+    {
+      "identifier": "voiceMicrosoft21Flash",
+      "type": "menu",
+      "title": "Voice · Microsoft MAI 2.1 Flash",
+      "desc": "选择与当前模型匹配的音色；Custom Voice 非空时优先覆盖。",
+      "defaultValue": "en-US-Harper:MAI-Voice-2.1-Flash",
+      "menuValues": [
+        {
+          "title": "cs-CZ-Grant:MAI-Voice-2.1-Flash",
+          "value": "cs-CZ-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "cs-CZ-Harper:MAI-Voice-2.1-Flash",
+          "value": "cs-CZ-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "da-DK-Grant:MAI-Voice-2.1-Flash",
+          "value": "da-DK-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "da-DK-Harper:MAI-Voice-2.1-Flash",
+          "value": "da-DK-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "de-DE-Grant:MAI-Voice-2.1-Flash",
+          "value": "de-DE-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "de-DE-Harper:MAI-Voice-2.1-Flash",
+          "value": "de-DE-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "de-DE-Klaus:MAI-Voice-2.1-Flash",
+          "value": "de-DE-Klaus:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "de-DE-Mia:MAI-Voice-2.1-Flash",
+          "value": "de-DE-Mia:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-AU-Isla:MAI-Voice-2.1-Flash",
+          "value": "en-AU-Isla:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-GB-Emily:MAI-Voice-2.1-Flash",
+          "value": "en-GB-Emily:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-GB-Harry:MAI-Voice-2.1-Flash",
+          "value": "en-GB-Harry:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-IN-Dhruv:MAI-Voice-2.1-Flash",
+          "value": "en-IN-Dhruv:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-IN-Priya:MAI-Voice-2.1-Flash",
+          "value": "en-IN-Priya:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-US-Ethan:MAI-Voice-2.1-Flash",
+          "value": "en-US-Ethan:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-US-Grant:MAI-Voice-2.1-Flash",
+          "value": "en-US-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-US-Harper:MAI-Voice-2.1-Flash",
+          "value": "en-US-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-US-Iris:MAI-Voice-2.1-Flash",
+          "value": "en-US-Iris:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-US-Jasper:MAI-Voice-2.1-Flash",
+          "value": "en-US-Jasper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-US-Olivia:MAI-Voice-2.1-Flash",
+          "value": "en-US-Olivia:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "en-US-Sage:MAI-Voice-2.1-Flash",
+          "value": "en-US-Sage:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "es-ES-Marta:MAI-Voice-2.1-Flash",
+          "value": "es-ES-Marta:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "es-MX-Alejo:MAI-Voice-2.1-Flash",
+          "value": "es-MX-Alejo:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "es-MX-Grant:MAI-Voice-2.1-Flash",
+          "value": "es-MX-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "es-MX-Harper:MAI-Voice-2.1-Flash",
+          "value": "es-MX-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "es-MX-Valeria:MAI-Voice-2.1-Flash",
+          "value": "es-MX-Valeria:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "fi-FI-Grant:MAI-Voice-2.1-Flash",
+          "value": "fi-FI-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "fi-FI-Harper:MAI-Voice-2.1-Flash",
+          "value": "fi-FI-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "fr-FR-Grant:MAI-Voice-2.1-Flash",
+          "value": "fr-FR-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "fr-FR-Harper:MAI-Voice-2.1-Flash",
+          "value": "fr-FR-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "fr-FR-Marc:MAI-Voice-2.1-Flash",
+          "value": "fr-FR-Marc:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "fr-FR-Soleil:MAI-Voice-2.1-Flash",
+          "value": "fr-FR-Soleil:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hi-IN-Arjun:MAI-Voice-2.1-Flash",
+          "value": "hi-IN-Arjun:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hi-IN-Dhruv:MAI-Voice-2.1-Flash",
+          "value": "hi-IN-Dhruv:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hi-IN-Grant:MAI-Voice-2.1-Flash",
+          "value": "hi-IN-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hi-IN-Harper:MAI-Voice-2.1-Flash",
+          "value": "hi-IN-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hi-IN-Kavya:MAI-Voice-2.1-Flash",
+          "value": "hi-IN-Kavya:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hi-IN-Priya:MAI-Voice-2.1-Flash",
+          "value": "hi-IN-Priya:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hu-HU-Bence:MAI-Voice-2.1-Flash",
+          "value": "hu-HU-Bence:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hu-HU-Grant:MAI-Voice-2.1-Flash",
+          "value": "hu-HU-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hu-HU-Harper:MAI-Voice-2.1-Flash",
+          "value": "hu-HU-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hu-HU-Levente:MAI-Voice-2.1-Flash",
+          "value": "hu-HU-Levente:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hu-HU-Lilla:MAI-Voice-2.1-Flash",
+          "value": "hu-HU-Lilla:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "hu-HU-Reka:MAI-Voice-2.1-Flash",
+          "value": "hu-HU-Reka:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "id-ID-Grant:MAI-Voice-2.1-Flash",
+          "value": "id-ID-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "id-ID-Harper:MAI-Voice-2.1-Flash",
+          "value": "id-ID-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "it-IT-Grant:MAI-Voice-2.1-Flash",
+          "value": "it-IT-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "it-IT-Harper:MAI-Voice-2.1-Flash",
+          "value": "it-IT-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "it-IT-Luca:MAI-Voice-2.1-Flash",
+          "value": "it-IT-Luca:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "it-IT-Rosa:MAI-Voice-2.1-Flash",
+          "value": "it-IT-Rosa:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ko-KR-Grant:MAI-Voice-2.1-Flash",
+          "value": "ko-KR-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ko-KR-Haena:MAI-Voice-2.1-Flash",
+          "value": "ko-KR-Haena:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ko-KR-Harper:MAI-Voice-2.1-Flash",
+          "value": "ko-KR-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ko-KR-Junho:MAI-Voice-2.1-Flash",
+          "value": "ko-KR-Junho:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "nb-NO-Grant:MAI-Voice-2.1-Flash",
+          "value": "nb-NO-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "nb-NO-Harper:MAI-Voice-2.1-Flash",
+          "value": "nb-NO-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "nl-NL-Grant:MAI-Voice-2.1-Flash",
+          "value": "nl-NL-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "nl-NL-Harper:MAI-Voice-2.1-Flash",
+          "value": "nl-NL-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "nl-NL-Sander:MAI-Voice-2.1-Flash",
+          "value": "nl-NL-Sander:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pl-PL-Grant:MAI-Voice-2.1-Flash",
+          "value": "pl-PL-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pl-PL-Harper:MAI-Voice-2.1-Flash",
+          "value": "pl-PL-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pt-BR-Caio:MAI-Voice-2.1-Flash",
+          "value": "pt-BR-Caio:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pt-BR-Grant:MAI-Voice-2.1-Flash",
+          "value": "pt-BR-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pt-BR-Harper:MAI-Voice-2.1-Flash",
+          "value": "pt-BR-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pt-BR-Luana:MAI-Voice-2.1-Flash",
+          "value": "pt-BR-Luana:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pt-BR-Pedro:MAI-Voice-2.1-Flash",
+          "value": "pt-BR-Pedro:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pt-BR-Rafael:MAI-Voice-2.1-Flash",
+          "value": "pt-BR-Rafael:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pt-PT-Grant:MAI-Voice-2.1-Flash",
+          "value": "pt-PT-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pt-PT-Harper:MAI-Voice-2.1-Flash",
+          "value": "pt-PT-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "pt-PT-Rui:MAI-Voice-2.1-Flash",
+          "value": "pt-PT-Rui:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ro-RO-Andrei:MAI-Voice-2.1-Flash",
+          "value": "ro-RO-Andrei:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ro-RO-Elena:MAI-Voice-2.1-Flash",
+          "value": "ro-RO-Elena:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ro-RO-Grant:MAI-Voice-2.1-Flash",
+          "value": "ro-RO-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ro-RO-Harper:MAI-Voice-2.1-Flash",
+          "value": "ro-RO-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ro-RO-Ioana:MAI-Voice-2.1-Flash",
+          "value": "ro-RO-Ioana:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ro-RO-Radu:MAI-Voice-2.1-Flash",
+          "value": "ro-RO-Radu:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ru-RU-Grant:MAI-Voice-2.1-Flash",
+          "value": "ru-RU-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ru-RU-Harper:MAI-Voice-2.1-Flash",
+          "value": "ru-RU-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ru-RU-Lev:MAI-Voice-2.1-Flash",
+          "value": "ru-RU-Lev:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "ru-RU-Masha:MAI-Voice-2.1-Flash",
+          "value": "ru-RU-Masha:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "sv-SE-Grant:MAI-Voice-2.1-Flash",
+          "value": "sv-SE-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "sv-SE-Harper:MAI-Voice-2.1-Flash",
+          "value": "sv-SE-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "th-TH-Grant:MAI-Voice-2.1-Flash",
+          "value": "th-TH-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "th-TH-Harper:MAI-Voice-2.1-Flash",
+          "value": "th-TH-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "th-TH-Krit:MAI-Voice-2.1-Flash",
+          "value": "th-TH-Krit:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "th-TH-Nattapong:MAI-Voice-2.1-Flash",
+          "value": "th-TH-Nattapong:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "tr-TR-Aydin:MAI-Voice-2.1-Flash",
+          "value": "tr-TR-Aydin:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "tr-TR-Elif:MAI-Voice-2.1-Flash",
+          "value": "tr-TR-Elif:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "tr-TR-Grant:MAI-Voice-2.1-Flash",
+          "value": "tr-TR-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "tr-TR-Harper:MAI-Voice-2.1-Flash",
+          "value": "tr-TR-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "vi-VN-Grant:MAI-Voice-2.1-Flash",
+          "value": "vi-VN-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "vi-VN-Harper:MAI-Voice-2.1-Flash",
+          "value": "vi-VN-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "zh-CN-Bo:MAI-Voice-2.1-Flash",
+          "value": "zh-CN-Bo:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "zh-CN-Grant:MAI-Voice-2.1-Flash",
+          "value": "zh-CN-Grant:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "zh-CN-Harper:MAI-Voice-2.1-Flash",
+          "value": "zh-CN-Harper:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "zh-CN-Lan:MAI-Voice-2.1-Flash",
+          "value": "zh-CN-Lan:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "zh-CN-Mei:MAI-Voice-2.1-Flash",
+          "value": "zh-CN-Mei:MAI-Voice-2.1-Flash"
+        },
+        {
+          "title": "zh-CN-Wei:MAI-Voice-2.1-Flash",
+          "value": "zh-CN-Wei:MAI-Voice-2.1-Flash"
+        }
+      ]
+    },
+    {
+      "identifier": "voiceMicrosoft21",
+      "type": "menu",
+      "title": "Voice · Microsoft MAI 2.1",
+      "desc": "选择与当前模型匹配的音色；Custom Voice 非空时优先覆盖。",
+      "defaultValue": "en-US-Harper:MAI-Voice-2.1",
+      "menuValues": [
+        {
+          "title": "cs-CZ-Grant:MAI-Voice-2.1",
+          "value": "cs-CZ-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "cs-CZ-Harper:MAI-Voice-2.1",
+          "value": "cs-CZ-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "da-DK-Grant:MAI-Voice-2.1",
+          "value": "da-DK-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "da-DK-Harper:MAI-Voice-2.1",
+          "value": "da-DK-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "de-DE-Grant:MAI-Voice-2.1",
+          "value": "de-DE-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "de-DE-Harper:MAI-Voice-2.1",
+          "value": "de-DE-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "de-DE-Klaus:MAI-Voice-2.1",
+          "value": "de-DE-Klaus:MAI-Voice-2.1"
+        },
+        {
+          "title": "de-DE-Mia:MAI-Voice-2.1",
+          "value": "de-DE-Mia:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-AU-Isla:MAI-Voice-2.1",
+          "value": "en-AU-Isla:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-GB-Emily:MAI-Voice-2.1",
+          "value": "en-GB-Emily:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-GB-Harry:MAI-Voice-2.1",
+          "value": "en-GB-Harry:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-IN-Dhruv:MAI-Voice-2.1",
+          "value": "en-IN-Dhruv:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-IN-Priya:MAI-Voice-2.1",
+          "value": "en-IN-Priya:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-US-Ethan:MAI-Voice-2.1",
+          "value": "en-US-Ethan:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-US-Grant:MAI-Voice-2.1",
+          "value": "en-US-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-US-Harper:MAI-Voice-2.1",
+          "value": "en-US-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-US-Iris:MAI-Voice-2.1",
+          "value": "en-US-Iris:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-US-Jasper:MAI-Voice-2.1",
+          "value": "en-US-Jasper:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-US-Olivia:MAI-Voice-2.1",
+          "value": "en-US-Olivia:MAI-Voice-2.1"
+        },
+        {
+          "title": "en-US-Sage:MAI-Voice-2.1",
+          "value": "en-US-Sage:MAI-Voice-2.1"
+        },
+        {
+          "title": "es-ES-Marta:MAI-Voice-2.1",
+          "value": "es-ES-Marta:MAI-Voice-2.1"
+        },
+        {
+          "title": "es-MX-Alejo:MAI-Voice-2.1",
+          "value": "es-MX-Alejo:MAI-Voice-2.1"
+        },
+        {
+          "title": "es-MX-Grant:MAI-Voice-2.1",
+          "value": "es-MX-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "es-MX-Harper:MAI-Voice-2.1",
+          "value": "es-MX-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "es-MX-Valeria:MAI-Voice-2.1",
+          "value": "es-MX-Valeria:MAI-Voice-2.1"
+        },
+        {
+          "title": "fi-FI-Grant:MAI-Voice-2.1",
+          "value": "fi-FI-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "fi-FI-Harper:MAI-Voice-2.1",
+          "value": "fi-FI-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "fr-FR-Grant:MAI-Voice-2.1",
+          "value": "fr-FR-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "fr-FR-Harper:MAI-Voice-2.1",
+          "value": "fr-FR-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "fr-FR-Marc:MAI-Voice-2.1",
+          "value": "fr-FR-Marc:MAI-Voice-2.1"
+        },
+        {
+          "title": "fr-FR-Soleil:MAI-Voice-2.1",
+          "value": "fr-FR-Soleil:MAI-Voice-2.1"
+        },
+        {
+          "title": "hi-IN-Arjun:MAI-Voice-2.1",
+          "value": "hi-IN-Arjun:MAI-Voice-2.1"
+        },
+        {
+          "title": "hi-IN-Dhruv:MAI-Voice-2.1",
+          "value": "hi-IN-Dhruv:MAI-Voice-2.1"
+        },
+        {
+          "title": "hi-IN-Grant:MAI-Voice-2.1",
+          "value": "hi-IN-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "hi-IN-Harper:MAI-Voice-2.1",
+          "value": "hi-IN-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "hi-IN-Kavya:MAI-Voice-2.1",
+          "value": "hi-IN-Kavya:MAI-Voice-2.1"
+        },
+        {
+          "title": "hi-IN-Priya:MAI-Voice-2.1",
+          "value": "hi-IN-Priya:MAI-Voice-2.1"
+        },
+        {
+          "title": "hu-HU-Bence:MAI-Voice-2.1",
+          "value": "hu-HU-Bence:MAI-Voice-2.1"
+        },
+        {
+          "title": "hu-HU-Grant:MAI-Voice-2.1",
+          "value": "hu-HU-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "hu-HU-Harper:MAI-Voice-2.1",
+          "value": "hu-HU-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "hu-HU-Levente:MAI-Voice-2.1",
+          "value": "hu-HU-Levente:MAI-Voice-2.1"
+        },
+        {
+          "title": "hu-HU-Lilla:MAI-Voice-2.1",
+          "value": "hu-HU-Lilla:MAI-Voice-2.1"
+        },
+        {
+          "title": "hu-HU-Reka:MAI-Voice-2.1",
+          "value": "hu-HU-Reka:MAI-Voice-2.1"
+        },
+        {
+          "title": "id-ID-Grant:MAI-Voice-2.1",
+          "value": "id-ID-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "id-ID-Harper:MAI-Voice-2.1",
+          "value": "id-ID-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "it-IT-Grant:MAI-Voice-2.1",
+          "value": "it-IT-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "it-IT-Harper:MAI-Voice-2.1",
+          "value": "it-IT-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "it-IT-Luca:MAI-Voice-2.1",
+          "value": "it-IT-Luca:MAI-Voice-2.1"
+        },
+        {
+          "title": "it-IT-Rosa:MAI-Voice-2.1",
+          "value": "it-IT-Rosa:MAI-Voice-2.1"
+        },
+        {
+          "title": "ko-KR-Grant:MAI-Voice-2.1",
+          "value": "ko-KR-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "ko-KR-Haena:MAI-Voice-2.1",
+          "value": "ko-KR-Haena:MAI-Voice-2.1"
+        },
+        {
+          "title": "ko-KR-Harper:MAI-Voice-2.1",
+          "value": "ko-KR-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "ko-KR-Junho:MAI-Voice-2.1",
+          "value": "ko-KR-Junho:MAI-Voice-2.1"
+        },
+        {
+          "title": "nb-NO-Grant:MAI-Voice-2.1",
+          "value": "nb-NO-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "nb-NO-Harper:MAI-Voice-2.1",
+          "value": "nb-NO-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "nl-NL-Grant:MAI-Voice-2.1",
+          "value": "nl-NL-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "nl-NL-Harper:MAI-Voice-2.1",
+          "value": "nl-NL-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "nl-NL-Sander:MAI-Voice-2.1",
+          "value": "nl-NL-Sander:MAI-Voice-2.1"
+        },
+        {
+          "title": "pl-PL-Grant:MAI-Voice-2.1",
+          "value": "pl-PL-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "pl-PL-Harper:MAI-Voice-2.1",
+          "value": "pl-PL-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "pt-BR-Caio:MAI-Voice-2.1",
+          "value": "pt-BR-Caio:MAI-Voice-2.1"
+        },
+        {
+          "title": "pt-BR-Grant:MAI-Voice-2.1",
+          "value": "pt-BR-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "pt-BR-Harper:MAI-Voice-2.1",
+          "value": "pt-BR-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "pt-BR-Luana:MAI-Voice-2.1",
+          "value": "pt-BR-Luana:MAI-Voice-2.1"
+        },
+        {
+          "title": "pt-BR-Pedro:MAI-Voice-2.1",
+          "value": "pt-BR-Pedro:MAI-Voice-2.1"
+        },
+        {
+          "title": "pt-BR-Rafael:MAI-Voice-2.1",
+          "value": "pt-BR-Rafael:MAI-Voice-2.1"
+        },
+        {
+          "title": "pt-PT-Grant:MAI-Voice-2.1",
+          "value": "pt-PT-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "pt-PT-Harper:MAI-Voice-2.1",
+          "value": "pt-PT-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "pt-PT-Rui:MAI-Voice-2.1",
+          "value": "pt-PT-Rui:MAI-Voice-2.1"
+        },
+        {
+          "title": "ro-RO-Andrei:MAI-Voice-2.1",
+          "value": "ro-RO-Andrei:MAI-Voice-2.1"
+        },
+        {
+          "title": "ro-RO-Elena:MAI-Voice-2.1",
+          "value": "ro-RO-Elena:MAI-Voice-2.1"
+        },
+        {
+          "title": "ro-RO-Grant:MAI-Voice-2.1",
+          "value": "ro-RO-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "ro-RO-Harper:MAI-Voice-2.1",
+          "value": "ro-RO-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "ro-RO-Ioana:MAI-Voice-2.1",
+          "value": "ro-RO-Ioana:MAI-Voice-2.1"
+        },
+        {
+          "title": "ro-RO-Radu:MAI-Voice-2.1",
+          "value": "ro-RO-Radu:MAI-Voice-2.1"
+        },
+        {
+          "title": "ru-RU-Grant:MAI-Voice-2.1",
+          "value": "ru-RU-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "ru-RU-Harper:MAI-Voice-2.1",
+          "value": "ru-RU-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "ru-RU-Lev:MAI-Voice-2.1",
+          "value": "ru-RU-Lev:MAI-Voice-2.1"
+        },
+        {
+          "title": "ru-RU-Masha:MAI-Voice-2.1",
+          "value": "ru-RU-Masha:MAI-Voice-2.1"
+        },
+        {
+          "title": "sv-SE-Grant:MAI-Voice-2.1",
+          "value": "sv-SE-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "sv-SE-Harper:MAI-Voice-2.1",
+          "value": "sv-SE-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "th-TH-Grant:MAI-Voice-2.1",
+          "value": "th-TH-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "th-TH-Harper:MAI-Voice-2.1",
+          "value": "th-TH-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "th-TH-Krit:MAI-Voice-2.1",
+          "value": "th-TH-Krit:MAI-Voice-2.1"
+        },
+        {
+          "title": "th-TH-Nattapong:MAI-Voice-2.1",
+          "value": "th-TH-Nattapong:MAI-Voice-2.1"
+        },
+        {
+          "title": "tr-TR-Aydin:MAI-Voice-2.1",
+          "value": "tr-TR-Aydin:MAI-Voice-2.1"
+        },
+        {
+          "title": "tr-TR-Elif:MAI-Voice-2.1",
+          "value": "tr-TR-Elif:MAI-Voice-2.1"
+        },
+        {
+          "title": "tr-TR-Grant:MAI-Voice-2.1",
+          "value": "tr-TR-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "tr-TR-Harper:MAI-Voice-2.1",
+          "value": "tr-TR-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "vi-VN-Grant:MAI-Voice-2.1",
+          "value": "vi-VN-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "vi-VN-Harper:MAI-Voice-2.1",
+          "value": "vi-VN-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "zh-CN-Bo:MAI-Voice-2.1",
+          "value": "zh-CN-Bo:MAI-Voice-2.1"
+        },
+        {
+          "title": "zh-CN-Grant:MAI-Voice-2.1",
+          "value": "zh-CN-Grant:MAI-Voice-2.1"
+        },
+        {
+          "title": "zh-CN-Harper:MAI-Voice-2.1",
+          "value": "zh-CN-Harper:MAI-Voice-2.1"
+        },
+        {
+          "title": "zh-CN-Lan:MAI-Voice-2.1",
+          "value": "zh-CN-Lan:MAI-Voice-2.1"
+        },
+        {
+          "title": "zh-CN-Mei:MAI-Voice-2.1",
+          "value": "zh-CN-Mei:MAI-Voice-2.1"
+        },
+        {
+          "title": "zh-CN-Wei:MAI-Voice-2.1",
+          "value": "zh-CN-Wei:MAI-Voice-2.1"
         }
       ]
     },
@@ -747,6 +1553,159 @@
       ]
     },
     {
+      "identifier": "voiceDeepgramFlux",
+      "type": "menu",
+      "title": "Voice · Deepgram Flux",
+      "desc": "用于 deepgram/flux-tts:free。36 个英语音色，覆盖美式 / 英式 / 爱尔兰 / 澳式 / 印度 / 新加坡 / 菲律宾口音。",
+      "defaultValue": "flux-haley-en",
+      "menuValues": [
+        {
+          "title": "Haley — American (美式·女)",
+          "value": "flux-haley-en"
+        },
+        {
+          "title": "Alexis — American (美式·女)",
+          "value": "flux-alexis-en"
+        },
+        {
+          "title": "Bree — American (美式·女)",
+          "value": "flux-bree-en"
+        },
+        {
+          "title": "Brittany — American (美式·女)",
+          "value": "flux-brittany-en"
+        },
+        {
+          "title": "Brooke — American (美式·女)",
+          "value": "flux-brooke-en"
+        },
+        {
+          "title": "Bruce — American (美式·男)",
+          "value": "flux-bruce-en"
+        },
+        {
+          "title": "Cliff — American (美式·男)",
+          "value": "flux-cliff-en"
+        },
+        {
+          "title": "Cole — American (美式·男)",
+          "value": "flux-cole-en"
+        },
+        {
+          "title": "Colin — British (英式·男)",
+          "value": "flux-colin-en"
+        },
+        {
+          "title": "Conor — British (英式·男)",
+          "value": "flux-conor-en"
+        },
+        {
+          "title": "Donovan — American (美式·男)",
+          "value": "flux-donovan-en"
+        },
+        {
+          "title": "Drew — American (美式·男)",
+          "value": "flux-drew-en"
+        },
+        {
+          "title": "Elise — American (美式·女)",
+          "value": "flux-elise-en"
+        },
+        {
+          "title": "Gemma — British (英式·女)",
+          "value": "flux-gemma-en"
+        },
+        {
+          "title": "Hannah — American (美式·女)",
+          "value": "flux-hannah-en"
+        },
+        {
+          "title": "Heather — American (美式·女)",
+          "value": "flux-heather-en"
+        },
+        {
+          "title": "Jack — British (英式·男)",
+          "value": "flux-jack-en"
+        },
+        {
+          "title": "Kai — Singaporean (新加坡·男)",
+          "value": "flux-kai-en"
+        },
+        {
+          "title": "Kelsey — American (美式·女)",
+          "value": "flux-kelsey-en"
+        },
+        {
+          "title": "Kit — British (英式·男)",
+          "value": "flux-kit-en"
+        },
+        {
+          "title": "Maeve — Irish (爱尔兰·女)",
+          "value": "flux-maeve-en"
+        },
+        {
+          "title": "Marcelo — Filipino (菲律宾·男)",
+          "value": "flux-marcelo-en"
+        },
+        {
+          "title": "Marcus — American (美式·男)",
+          "value": "flux-marcus-en"
+        },
+        {
+          "title": "Meena — Indian (印度·女)",
+          "value": "flux-meena-en"
+        },
+        {
+          "title": "Meghan — American (美式·女)",
+          "value": "flux-meghan-en"
+        },
+        {
+          "title": "Miles — American (美式·男)",
+          "value": "flux-miles-en"
+        },
+        {
+          "title": "Naveen — Indian (印度·男)",
+          "value": "flux-naveen-en"
+        },
+        {
+          "title": "Paige — American (美式·女)",
+          "value": "flux-paige-en"
+        },
+        {
+          "title": "Priya — Indian (印度·女)",
+          "value": "flux-priya-en"
+        },
+        {
+          "title": "Rufus — British (英式·男)",
+          "value": "flux-rufus-en"
+        },
+        {
+          "title": "Sean — British (英式·男)",
+          "value": "flux-sean-en"
+        },
+        {
+          "title": "Sharon — Australian (澳式·女)",
+          "value": "flux-sharon-en"
+        },
+        {
+          "title": "Sienna — American (美式·女)",
+          "value": "flux-sienna-en"
+        },
+        {
+          "title": "Tanner — British (英式·男)",
+          "value": "flux-tanner-en"
+        },
+        {
+          "title": "Wade — American (美式·男)",
+          "value": "flux-wade-en"
+        },
+        {
+          "title": "Wes — American (美式·男)",
+          "value": "flux-wes-en"
+        }
+      ]
+    },
+    {
       "identifier": "voiceDeepgram",
       "type": "menu",
       "title": "Voice · Deepgram Aura-2",
@@ -1116,189 +2075,191 @@
       ]
     },
     {
-      "identifier": "voiceDeepgramFlux",
+      "identifier": "voiceMiniMax",
       "type": "menu",
-      "title": "Voice · Deepgram Flux",
-      "desc": "用于 deepgram/flux-tts:free。36 个英语音色，覆盖美式 / 英式 / 爱尔兰 / 澳式 / 印度 / 新加坡 / 菲律宾口音。",
-      "defaultValue": "flux-haley-en",
+      "title": "Voice · MiniMax",
+      "desc": "选择与当前模型匹配的音色；Custom Voice 非空时优先覆盖。",
+      "defaultValue": "English_expressive_narrator",
       "menuValues": [
         {
-          "title": "Haley — American (美式·女)",
-          "value": "flux-haley-en"
+          "title": "English expressive narrator",
+          "value": "English_expressive_narrator"
         },
         {
-          "title": "Alexis — American (美式·女)",
-          "value": "flux-alexis-en"
+          "title": "English radiant girl",
+          "value": "English_radiant_girl"
         },
         {
-          "title": "Bree — American (美式·女)",
-          "value": "flux-bree-en"
+          "title": "English magnetic voiced man",
+          "value": "English_magnetic_voiced_man"
         },
         {
-          "title": "Brittany — American (美式·女)",
-          "value": "flux-brittany-en"
+          "title": "English compelling lady1",
+          "value": "English_compelling_lady1"
         },
         {
-          "title": "Brooke — American (美式·女)",
-          "value": "flux-brooke-en"
+          "title": "English Aussie Bloke",
+          "value": "English_Aussie_Bloke"
         },
         {
-          "title": "Bruce — American (美式·男)",
-          "value": "flux-bruce-en"
+          "title": "English captivating female1",
+          "value": "English_captivating_female1"
         },
         {
-          "title": "Cliff — American (美式·男)",
-          "value": "flux-cliff-en"
+          "title": "English Upbeat Woman",
+          "value": "English_Upbeat_Woman"
         },
         {
-          "title": "Cole — American (美式·男)",
-          "value": "flux-cole-en"
+          "title": "English Trustworth Man",
+          "value": "English_Trustworth_Man"
         },
         {
-          "title": "Colin — British (英式·男)",
-          "value": "flux-colin-en"
+          "title": "English CalmWoman",
+          "value": "English_CalmWoman"
         },
         {
-          "title": "Conor — British (英式·男)",
-          "value": "flux-conor-en"
+          "title": "English UpsetGirl",
+          "value": "English_UpsetGirl"
         },
         {
-          "title": "Donovan — American (美式·男)",
-          "value": "flux-donovan-en"
+          "title": "English Gentle-voiced man",
+          "value": "English_Gentle-voiced_man"
         },
         {
-          "title": "Drew — American (美式·男)",
-          "value": "flux-drew-en"
+          "title": "English Whispering girl",
+          "value": "English_Whispering_girl"
         },
         {
-          "title": "Elise — American (美式·女)",
-          "value": "flux-elise-en"
+          "title": "English Diligent Man",
+          "value": "English_Diligent_Man"
         },
         {
-          "title": "Gemma — British (英式·女)",
-          "value": "flux-gemma-en"
+          "title": "English Graceful Lady",
+          "value": "English_Graceful_Lady"
         },
         {
-          "title": "Hannah — American (美式·女)",
-          "value": "flux-hannah-en"
+          "title": "English ReservedYoungMan",
+          "value": "English_ReservedYoungMan"
         },
         {
-          "title": "Heather — American (美式·女)",
-          "value": "flux-heather-en"
+          "title": "English PlayfulGirl",
+          "value": "English_PlayfulGirl"
         },
         {
-          "title": "Jack — British (英式·男)",
-          "value": "flux-jack-en"
+          "title": "English ManWithDeepVoice",
+          "value": "English_ManWithDeepVoice"
         },
         {
-          "title": "Kai — Singaporean (新加坡·男)",
-          "value": "flux-kai-en"
+          "title": "English MaturePartner",
+          "value": "English_MaturePartner"
         },
         {
-          "title": "Kelsey — American (美式·女)",
-          "value": "flux-kelsey-en"
+          "title": "English FriendlyPerson",
+          "value": "English_FriendlyPerson"
         },
         {
-          "title": "Kit — British (英式·男)",
-          "value": "flux-kit-en"
+          "title": "English MatureBoss",
+          "value": "English_MatureBoss"
         },
         {
-          "title": "Maeve — Irish (爱尔兰·女)",
-          "value": "flux-maeve-en"
+          "title": "English Debator",
+          "value": "English_Debator"
         },
         {
-          "title": "Marcelo — Filipino (菲律宾·男)",
-          "value": "flux-marcelo-en"
+          "title": "English LovelyGirl",
+          "value": "English_LovelyGirl"
         },
         {
-          "title": "Marcus — American (美式·男)",
-          "value": "flux-marcus-en"
+          "title": "English Steadymentor",
+          "value": "English_Steadymentor"
         },
         {
-          "title": "Meena — Indian (印度·女)",
-          "value": "flux-meena-en"
+          "title": "English Deep-VoicedGentleman",
+          "value": "English_Deep-VoicedGentleman"
         },
         {
-          "title": "Meghan — American (美式·女)",
-          "value": "flux-meghan-en"
+          "title": "English Wiselady",
+          "value": "English_Wiselady"
         },
         {
-          "title": "Miles — American (美式·男)",
-          "value": "flux-miles-en"
+          "title": "English CaptivatingStoryteller",
+          "value": "English_CaptivatingStoryteller"
         },
         {
-          "title": "Naveen — Indian (印度·男)",
-          "value": "flux-naveen-en"
+          "title": "English DecentYoungMan",
+          "value": "English_DecentYoungMan"
         },
         {
-          "title": "Paige — American (美式·女)",
-          "value": "flux-paige-en"
+          "title": "English SentimentalLady",
+          "value": "English_SentimentalLady"
         },
         {
-          "title": "Priya — Indian (印度·女)",
-          "value": "flux-priya-en"
+          "title": "English ImposingManner",
+          "value": "English_ImposingManner"
         },
         {
-          "title": "Rufus — British (英式·男)",
-          "value": "flux-rufus-en"
+          "title": "English SadTeen",
+          "value": "English_SadTeen"
         },
         {
-          "title": "Sean — British (英式·男)",
-          "value": "flux-sean-en"
+          "title": "English PassionateWarrior",
+          "value": "English_PassionateWarrior"
         },
         {
-          "title": "Sharon — Australian (澳式·女)",
-          "value": "flux-sharon-en"
+          "title": "English WiseScholar",
+          "value": "English_WiseScholar"
         },
         {
-          "title": "Sienna — American (美式·女)",
-          "value": "flux-sienna-en"
+          "title": "English Soft-spokenGirl",
+          "value": "English_Soft-spokenGirl"
         },
         {
-          "title": "Tanner — British (英式·男)",
-          "value": "flux-tanner-en"
+          "title": "English SereneWoman",
+          "value": "English_SereneWoman"
         },
         {
-          "title": "Wade — American (美式·男)",
-          "value": "flux-wade-en"
+          "title": "English ConfidentWoman",
+          "value": "English_ConfidentWoman"
         },
         {
-          "title": "Wes — American (美式·男)",
-          "value": "flux-wes-en"
-        }
-      ]
-    },
-    {
-      "identifier": "voiceQwenFlash",
-      "type": "menu",
-      "title": "Voice · Qwen Flash",
-      "desc": "用于 qwen/qwen-audio-3.0-tts-flash。",
-      "defaultValue": "loongjohn",
-      "menuValues": [
-        {
-          "title": "loongjohn",
-          "value": "loongjohn"
+          "title": "English PatientMan",
+          "value": "English_PatientMan"
         },
         {
-          "title": "longanhuan_v3.6",
-          "value": "longanhuan_v3.6"
-        }
-      ]
-    },
-    {
-      "identifier": "voiceQwenPlus",
-      "type": "menu",
-      "title": "Voice · Qwen Plus",
-      "desc": "用于 qwen/qwen-audio-3.0-tts-plus。",
-      "defaultValue": "longanlingxin",
-      "menuValues": [
-        {
-          "title": "longanlingxin",
-          "value": "longanlingxin"
+          "title": "English Comedian",
+          "value": "English_Comedian"
         },
         {
-          "title": "longanlufeng",
-          "value": "longanlufeng"
+          "title": "English BossyLeader",
+          "value": "English_BossyLeader"
+        },
+        {
+          "title": "English Strong-WilledBoy",
+          "value": "English_Strong-WilledBoy"
+        },
+        {
+          "title": "English StressedLady",
+          "value": "English_StressedLady"
+        },
+        {
+          "title": "English AssertiveQueen",
+          "value": "English_AssertiveQueen"
+        },
+        {
+          "title": "English AnimeCharacter",
+          "value": "English_AnimeCharacter"
+        },
+        {
+          "title": "English Jovialman",
+          "value": "English_Jovialman"
+        },
+        {
+          "title": "English WhimsicalGirl",
+          "value": "English_WhimsicalGirl"
+        },
+        {
+          "title": "English Kind-heartedGirl",
+          "value": "English_Kind-heartedGirl"
         }
       ]
     },
@@ -1324,11 +2285,45 @@
       ]
     },
     {
+      "identifier": "voiceQwenPlus",
+      "type": "menu",
+      "title": "Voice · Qwen Plus",
+      "desc": "用于 qwen/qwen-audio-3.0-tts-plus。",
+      "defaultValue": "longanlingxin",
+      "menuValues": [
+        {
+          "title": "longanlingxin",
+          "value": "longanlingxin"
+        },
+        {
+          "title": "longanlufeng",
+          "value": "longanlufeng"
+        }
+      ]
+    },
+    {
+      "identifier": "voiceQwenFlash",
+      "type": "menu",
+      "title": "Voice · Qwen Flash",
+      "desc": "用于 qwen/qwen-audio-3.0-tts-flash。",
+      "defaultValue": "loongjohn",
+      "menuValues": [
+        {
+          "title": "loongjohn",
+          "value": "loongjohn"
+        },
+        {
+          "title": "longanhuan_v3.6",
+          "value": "longanhuan_v3.6"
+        }
+      ]
+    },
+    {
       "identifier": "customVoice",
       "type": "text",
       "title": "Custom Voice",
       "defaultValue": "",
-      "desc": "可用于任意模型。非空时优先并覆盖对应的 Voice 菜单；清空后恢复菜单音色。MiniMax 与无法识别家族的自定义模型必须填写；Fish Audio 可填 reference ID，留空则用 provider 默认音色。",
+      "desc": "非空时覆盖当前模型的菜单音色，清空后恢复菜单。Fish Audio 可填写 reference ID，Seed 可填写 speaker ID 或留空；未知模型需要填写音色 ID。",
       "textConfig": {
         "type": "visible",
         "placeholderText": "填写自定义 voice ID（MiniMax 也可）"
@@ -1338,27 +2333,31 @@
       "identifier": "responseFormat",
       "type": "menu",
       "title": "Audio Format",
-      "defaultValue": "pcm",
-      "desc": "裸 PCM 会被包装成 WAV；其余格式需 provider 支持。插件优先依据响应 MIME，再用严格 magic bytes 识别；明确 PCM 时不采用 MP3 嗅探，JSON/文本不会被当作音频。",
+      "defaultValue": "auto",
+      "desc": "Auto 按模型选择格式（Voxtral / Seed 为 MP3，其余为 PCM）。OpenRouter 支持 MP3 / PCM；WAV / Opus / FLAC 供支持这些格式的自定义接口使用。",
       "menuValues": [
         {
-          "title": "PCM (wrap to WAV; default 24k)",
+          "title": "Auto (按模型)",
+          "value": "auto"
+        },
+        {
+          "title": "PCM (wrap to WAV)",
           "value": "pcm"
         },
         {
-          "title": "WAV (if supported)",
-          "value": "wav"
-        },
-        {
-          "title": "MP3 (if supported)",
+          "title": "MP3",
           "value": "mp3"
         },
         {
-          "title": "Opus (if supported)",
+          "title": "WAV (custom API)",
+          "value": "wav"
+        },
+        {
+          "title": "Opus (custom API)",
           "value": "opus"
         },
         {
-          "title": "FLAC (if supported)",
+          "title": "FLAC (custom API)",
           "value": "flac"
         }
       ]
@@ -1368,7 +2367,7 @@
       "type": "menu",
       "title": "PCM Sample Rate",
       "defaultValue": "auto",
-      "desc": "返回内容按裸 PCM 包装成 WAV 时生效（通常 Audio Format 为 pcm）。Auto 按模型家族选择：Fish Audio 44.1kHz、其他 24kHz；若播放仍变速（音调偏低拖沓=采样率偏小，偏高变快=偏大），可在此手动指定。",
+      "desc": "Auto 优先采用响应 Content-Type 中的 rate；缺失时按模型家族回退（Fish Audio 44.1kHz、其他 24kHz）。手动选项覆盖响应采样率；声道数采用响应 channels（缺失时 mono）。",
       "menuValues": [
         {
           "title": "Auto (按模型家族)",
@@ -1405,7 +2404,7 @@
       "type": "menu",
       "title": "Speed",
       "defaultValue": "1.0",
-      "desc": "仅在非 1.0x 时发送；部分 OpenRouter provider 可能会忽略该参数。",
+      "desc": "0.5x ~ 2.0x；仅非 1.0x 时发送。验证按钮使用相同语速；提供方可能忽略或拒绝不支持的参数。",
       "menuValues": [
         {
           "title": "0.5x",
@@ -1438,7 +2437,7 @@
       "type": "text",
       "title": "Instructions / Audio Tags",
       "defaultValue": "",
-      "desc": "可选。会作为前缀拼到待合成文本前，适合填写 Gemini audio tags 或简短风格提示。",
+      "desc": "可选。Gemini 3.8 单独传递风格提示；其他模型作为文本前缀。验证按钮使用相同配置。",
       "textConfig": {
         "type": "visible",
         "height": 80,

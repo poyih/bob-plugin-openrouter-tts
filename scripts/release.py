@@ -252,6 +252,9 @@ def release(
         "timestamp": timestamp if timestamp is not None else int(time.time() * 1000),
     }
 
+    # 固定 tag 构建产物的记录；上传成功后由 publish_appcast.py 合并，重试不重建安装包。
+    write_json_atomic(bundle.parent / "appcast-entry.json", {"identifier": info["identifier"], "entry": entry})
+
     if update_appcast:
         appcast["identifier"] = info["identifier"]
         appcast["versions"] = upsert_version(existing_versions, entry)
