@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.5.0",
+      "desc": "修复 PCM 响应采样率 / 声道数与空白前缀误判；新增 Auto 格式、同配置并发请求合并及真实配置验证；统一模型目录并补齐 23 个 speech 模型和 MiniMax / Microsoft 2.1 音色；新增普通提交 / PR CI、实时目录检查和保留版本记录的 appcast 发布重试",
+      "sha256": "1dfdccf4674ece98c677810612baf0116ce11c07e8c323fd5dd0584051410ff3",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.5.0/openrouter-tts-1.5.0.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1790909720290
+    },
+    {
       "version": "1.4.0",
       "desc": "同步 OpenRouter speech 模型目录（2026-09-25）：新增 Google Gemini 3.8 Flash TTS / Flash Lite TTS（复用 Voice · Gemini 菜单，Voice Design / Replication 的 voice_... ID 可填 Custom Voice）、Deepgram Flux TTS 免费档（新增 Voice · Deepgram Flux 菜单，36 个英语音色，默认 flux-haley-en）；移除已下架的 Zyphra Zonos v0.1 Transformer / Hybrid 预设及 Voice · Zyphra Zonos 菜单（OpenRouter 已无可用 endpoint）；共 20 个模型（2026-09-25 以实时 API 复核）",
       "sha256": "d855652d95f37197053cd33620c39176b6ec84ac62579e3091250b8f187c51af",
