@@ -1,5 +1,5 @@
 {
-  "verifiedAt": "2026-10-02",
+  "verifiedAt": "2026-10-18",
   "source": "https://openrouter.ai/api/v1/models?output_modalities=speech",
   "families": {
     "gemini": {
@@ -1600,7 +1600,7 @@
         "identifier": "voiceDeepgramFlux",
         "type": "menu",
         "title": "Voice · Deepgram Flux",
-        "desc": "用于 deepgram/flux-tts:free。36 个英语音色，覆盖美式 / 英式 / 爱尔兰 / 澳式 / 印度 / 新加坡 / 菲律宾口音。",
+        "desc": "用于 deepgram/flux-tts（付费）；旧免费模型已下架，请手动选择。36 个英语音色，覆盖美式 / 英式 / 爱尔兰 / 澳式 / 印度 / 新加坡 / 菲律宾口音。",
         "defaultValue": "flux-haley-en",
         "menuValues": [
           {
@@ -2505,6 +2505,186 @@
         2.0
       ],
       "instructionsMode": "prefix"
+    },
+    "elevenlabs": {
+      "prefixes": [
+        "elevenlabs/"
+      ],
+      "contains": [],
+      "voiceOption": {
+        "identifier": "voiceElevenLabs",
+        "type": "menu",
+        "title": "Voice · ElevenLabs",
+        "desc": "用于 elevenlabs/* TTS 模型。21 个预设音色；Custom Voice 可填写其他 ElevenLabs voice ID，私有音色需对应 BYOK。v3 / v4 系列仅使用 1.0x；Multilingual / Flash / Turbo v2 系列支持 0.7x ~ 1.2x。",
+        "defaultValue": "george",
+        "menuValues": [
+          {
+            "title": "George",
+            "value": "george"
+          },
+          {
+            "title": "Sarah",
+            "value": "sarah"
+          },
+          {
+            "title": "Adam",
+            "value": "adam"
+          },
+          {
+            "title": "Alice",
+            "value": "alice"
+          },
+          {
+            "title": "Bella",
+            "value": "bella"
+          },
+          {
+            "title": "Bill",
+            "value": "bill"
+          },
+          {
+            "title": "Brian",
+            "value": "brian"
+          },
+          {
+            "title": "Callum",
+            "value": "callum"
+          },
+          {
+            "title": "Charlie",
+            "value": "charlie"
+          },
+          {
+            "title": "Chris",
+            "value": "chris"
+          },
+          {
+            "title": "Daniel",
+            "value": "daniel"
+          },
+          {
+            "title": "Eric",
+            "value": "eric"
+          },
+          {
+            "title": "Harry",
+            "value": "harry"
+          },
+          {
+            "title": "Jessica",
+            "value": "jessica"
+          },
+          {
+            "title": "Laura",
+            "value": "laura"
+          },
+          {
+            "title": "Liam",
+            "value": "liam"
+          },
+          {
+            "title": "Lily",
+            "value": "lily"
+          },
+          {
+            "title": "Matilda",
+            "value": "matilda"
+          },
+          {
+            "title": "River",
+            "value": "river"
+          },
+          {
+            "title": "Roger",
+            "value": "roger"
+          },
+          {
+            "title": "Will",
+            "value": "will"
+          }
+        ]
+      },
+      "optionalVoice": false,
+      "defaultFormat": "pcm",
+      "formats": [
+        "pcm",
+        "mp3"
+      ],
+      "pcmSampleRate": 24000,
+      "maxInputChars": 10000,
+      "speedRange": [
+        0.7,
+        1.2
+      ],
+      "instructionsMode": "prefix"
+    },
+    "heygen": {
+      "prefixes": [
+        "heygen/"
+      ],
+      "contains": [],
+      "voiceOption": {
+        "identifier": "voiceHeyGen",
+        "type": "menu",
+        "title": "Voice · HeyGen",
+        "desc": "用于 HeyGen Voice / Voice Turbo。10 个预设音色，PCM 默认 44.1kHz，单次文本最多 5000 字符；自有克隆音色需对应 BYOK。",
+        "defaultValue": "nadine",
+        "menuValues": [
+          {
+            "title": "Nadine",
+            "value": "nadine"
+          },
+          {
+            "title": "Tabitha",
+            "value": "tabitha"
+          },
+          {
+            "title": "Bram",
+            "value": "bram"
+          },
+          {
+            "title": "Gareth",
+            "value": "gareth"
+          },
+          {
+            "title": "Noelle",
+            "value": "noelle"
+          },
+          {
+            "title": "Meredith",
+            "value": "meredith"
+          },
+          {
+            "title": "Sabrina",
+            "value": "sabrina"
+          },
+          {
+            "title": "Lucian",
+            "value": "lucian"
+          },
+          {
+            "title": "Weston",
+            "value": "weston"
+          },
+          {
+            "title": "Vincent",
+            "value": "vincent"
+          }
+        ]
+      },
+      "optionalVoice": false,
+      "defaultFormat": "pcm",
+      "formats": [
+        "pcm",
+        "mp3"
+      ],
+      "pcmSampleRate": 44100,
+      "maxInputChars": 5000,
+      "speedRange": [
+        0.5,
+        2.0
+      ],
+      "instructionsMode": "prefix"
     }
   },
   "models": [
@@ -2576,8 +2756,8 @@
       "family": "deepgram"
     },
     {
-      "id": "deepgram/flux-tts:free",
-      "title": "Flux TTS (Deepgram·免费)",
+      "id": "deepgram/flux-tts",
+      "title": "Flux TTS (Deepgram·付费)",
       "family": "deepgramflux"
     },
     {
@@ -2624,6 +2804,88 @@
       "id": "bytedance-seed/seed-audio-1-0",
       "title": "Seed Audio 1.0 (ByteDance)",
       "family": "seed"
+    },
+    {
+      "id": "fish-audio/drama-3",
+      "title": "Drama 3 (Fish Audio)",
+      "family": "fishaudio"
+    },
+    {
+      "id": "elevenlabs/eleven-v4",
+      "title": "Eleven v4 (ElevenLabs)",
+      "family": "elevenlabs",
+      "speedRange": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "id": "elevenlabs/eleven-v4-turbo",
+      "title": "Eleven v4 Turbo (ElevenLabs)",
+      "family": "elevenlabs",
+      "speedRange": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "id": "elevenlabs/eleven-v3",
+      "title": "Eleven v3 (ElevenLabs)",
+      "family": "elevenlabs",
+      "maxInputChars": 5000,
+      "speedRange": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "id": "elevenlabs/eleven-v3-conversational",
+      "title": "Eleven v3 Conversational (ElevenLabs)",
+      "family": "elevenlabs",
+      "maxInputChars": 5000,
+      "speedRange": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "id": "elevenlabs/eleven-multilingual-v2",
+      "title": "Eleven Multilingual v2 (ElevenLabs)",
+      "family": "elevenlabs"
+    },
+    {
+      "id": "elevenlabs/eleven-flash-v2.5",
+      "title": "Eleven Flash v2.5 (ElevenLabs)",
+      "family": "elevenlabs",
+      "maxInputChars": 40000
+    },
+    {
+      "id": "elevenlabs/eleven-flash-v2",
+      "title": "Eleven Flash v2 (ElevenLabs)",
+      "family": "elevenlabs",
+      "maxInputChars": 30000
+    },
+    {
+      "id": "elevenlabs/eleven-turbo-v2.5",
+      "title": "Eleven Turbo v2.5 (ElevenLabs)",
+      "family": "elevenlabs",
+      "maxInputChars": 40000
+    },
+    {
+      "id": "elevenlabs/eleven-turbo-v2",
+      "title": "Eleven Turbo v2 (ElevenLabs)",
+      "family": "elevenlabs",
+      "maxInputChars": 30000
+    },
+    {
+      "id": "heygen/heygen-voice-1",
+      "title": "HeyGen Voice (HeyGen)",
+      "family": "heygen"
+    },
+    {
+      "id": "heygen/heygen-voice-1-turbo",
+      "title": "HeyGen Voice Turbo (HeyGen)",
+      "family": "heygen"
     }
   ]
 }

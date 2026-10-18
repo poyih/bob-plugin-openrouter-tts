@@ -18,21 +18,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 检出 tag 源码
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
           path: source
       - name: 检出默认分支元数据
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.1
         with:
           ref: ${{ github.event.repository.default_branch }}
           fetch-depth: 0
           path: metadata
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: '24'
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7.0.0
         with:
           python-version: '3.12'
       - name: 读取版本号
@@ -72,7 +72,7 @@ jobs:
         run: |
           python3 scripts/release.py --version "$VERSION" --repo "$REPOSITORY" --no-appcast
       - name: 上传安装包
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3.0.3
         with:
           name: v${{ steps.meta.outputs.version }}
           files: source/dist/*.bobplugin

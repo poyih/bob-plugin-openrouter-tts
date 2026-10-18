@@ -27,7 +27,7 @@
 | Kokoro 82M (hexgrad) | `hexgrad/kokoro-82m` | Voice · Kokoro | 54 | pcm |
 | Voxtral Mini TTS (Mistral) | `mistralai/voxtral-mini-tts-2603` | Voice · Voxtral | 30 | mp3 |
 | Aura-2 (Deepgram) | `deepgram/aura-2` | Voice · Deepgram Aura-2 | 90 | pcm |
-| Flux TTS (Deepgram·免费) | `deepgram/flux-tts:free` | Voice · Deepgram Flux | 36 | pcm |
+| Flux TTS (Deepgram·付费) | `deepgram/flux-tts` | Voice · Deepgram Flux | 36 | pcm |
 | Speech 2.8 HD (MiniMax) | `minimax/speech-2.8-hd` | Voice · MiniMax | 45 | pcm |
 | Speech 2.8 Turbo (MiniMax) | `minimax/speech-2.8-turbo` | Voice · MiniMax | 45 | pcm |
 | S1 (Fish Audio) | `fish-audio/s1` | Voice · Fish Audio | 2 + 默认 | pcm |
@@ -37,8 +37,20 @@
 | Qwen-Audio-3.0-TTS Flash (Qwen) | `qwen/qwen-audio-3.0-tts-flash` | Voice · Qwen Flash | 2 | pcm |
 | Qwen-Audio-3.0-TTS Plus (Qwen) | `qwen/qwen-audio-3.0-tts-plus` | Voice · Qwen Plus | 2 | pcm |
 | Seed Audio 1.0 (ByteDance) | `bytedance-seed/seed-audio-1-0` | Custom Voice（可留空） | 默认 / speaker ID | mp3 |
+| Drama 3 (Fish Audio) | `fish-audio/drama-3` | Voice · Fish Audio | 2 + 默认 | pcm |
+| Eleven v4 (ElevenLabs) | `elevenlabs/eleven-v4` | Voice · ElevenLabs | 21 | pcm |
+| Eleven v4 Turbo (ElevenLabs) | `elevenlabs/eleven-v4-turbo` | Voice · ElevenLabs | 21 | pcm |
+| Eleven v3 (ElevenLabs) | `elevenlabs/eleven-v3` | Voice · ElevenLabs | 21 | pcm |
+| Eleven v3 Conversational (ElevenLabs) | `elevenlabs/eleven-v3-conversational` | Voice · ElevenLabs | 21 | pcm |
+| Eleven Multilingual v2 (ElevenLabs) | `elevenlabs/eleven-multilingual-v2` | Voice · ElevenLabs | 21 | pcm |
+| Eleven Flash v2.5 (ElevenLabs) | `elevenlabs/eleven-flash-v2.5` | Voice · ElevenLabs | 21 | pcm |
+| Eleven Flash v2 (ElevenLabs) | `elevenlabs/eleven-flash-v2` | Voice · ElevenLabs | 21 | pcm |
+| Eleven Turbo v2.5 (ElevenLabs) | `elevenlabs/eleven-turbo-v2.5` | Voice · ElevenLabs | 21 | pcm |
+| Eleven Turbo v2 (ElevenLabs) | `elevenlabs/eleven-turbo-v2` | Voice · ElevenLabs | 21 | pcm |
+| HeyGen Voice (HeyGen) | `heygen/heygen-voice-1` | Voice · HeyGen | 10 | pcm |
+| HeyGen Voice Turbo (HeyGen) | `heygen/heygen-voice-1-turbo` | Voice · HeyGen | 10 | pcm |
 
-目录于 2026-10-02 与 [OpenRouter speech 模型 API](https://openrouter.ai/api/v1/models?output_modalities=speech) 核对，共 23 个模型。模型可用性会变化；发布前运行 `python3 scripts/check_catalog.py` 检查目录漂移。
+目录于 2026-10-18 与 [OpenRouter speech 模型 API](https://openrouter.ai/api/v1/models?output_modalities=speech) 核对，共 35 个模型。模型可用性会变化；发布前运行 `python3 scripts/check_catalog.py` 检查目录漂移。
 
 MiniMax 接受菜单之外的音色 ID。Fish Audio 的菜单是社区 reference ID，不属于官方固定音色列表。Seed 根据输入描述生成音频，Custom Voice 可留空；单次输入最多 3000 字符。Microsoft MAI 2、2.1 和 2.1 Flash 使用不同的 Voice 菜单。
 <!-- END GENERATED MODELS -->
@@ -56,14 +68,14 @@ MiniMax 接受菜单之外的音色 ID。Fish Audio 的菜单是社区 reference
 | **Voice · 各家族** | 各模型家族的音色菜单，详见上表 |
 | **Custom Voice** | 非空时覆盖菜单，清空后恢复默认音色；未知家族的自定义模型需要填写。Fish Audio 可填 reference ID，Seed 可填 speaker ID 或留空 |
 | **Audio Format** | 默认 `Auto`：Voxtral / Seed 使用 `mp3`，其余使用 `pcm` 并包装为 WAV。已保存的显式 `pcm` 设置不会自动改成 Auto；Voxtral 请手动选 Auto / MP3。`wav` / `opus` / `flac` 供支持这些格式的自定义接口使用 |
-| **PCM Sample Rate** | 默认 `Auto` 优先读取响应的 `rate`；缺失时按模型家族回退（Fish Audio 44.1 kHz、其他 24 kHz）。手动值覆盖响应采样率，声道数按响应 `channels`（缺失时 1）包装 |
-| **Speed** | 语速：0.5x ~ 2.0x，仅在非 1.0x 时发送，部分 provider 可能会忽略 |
+| **PCM Sample Rate** | 默认 `Auto` 优先读取响应的 `rate`；缺失时按模型配置回退（Fish Audio / HeyGen 44.1 kHz、其他 24 kHz）。手动值覆盖响应采样率，声道数按响应 `channels`（缺失时 1）包装 |
+| **Speed** | 默认 1.0x，仅非默认值时发送，允许范围按模型校验。ElevenLabs 部分模型支持 0.7x ~ 1.2x，部分仅支持 1.0x |
 | **Instructions / Audio Tags** | 可选。Gemini 3.8 单独传递风格提示；其他模型作为文本前缀。验证按钮使用同一配置 |
 
 ## Voice 选择规则
 
 <!-- BEGIN GENERATED VOICE RULES -->
-先按完整模型 ID 查目录，再按家族匹配。Custom Voice 非空时始终优先；清空后恢复对应菜单。
+查询模型配置时去除 `:nitro` / `:floor` / `:exacto` / `:online` 路由后缀，保留 `:free` 等目录后缀；请求中的模型 ID 原样发送。先查模型目录，再按家族匹配。Custom Voice 非空时始终优先；清空后恢复对应菜单。
 
 | 家族 | 使用的配置项 | 默认 PCM 采样率 |
 | --- | --- | --- |
@@ -83,6 +95,8 @@ MiniMax 接受菜单之外的音色 ID。Fish Audio 的菜单是社区 reference
 | qwenplus | Voice · Qwen Plus | 24000 Hz |
 | qwenflash | Voice · Qwen Flash | 24000 Hz |
 | seed | Custom Voice（可留空） | 24000 Hz |
+| elevenlabs | Voice · ElevenLabs | 24000 Hz |
+| heygen | Voice · HeyGen | 44100 Hz |
 
 未知家族的自定义模型使用 Custom Voice；已知模型的能力、默认值和音色菜单都来自 `catalog.json`。
 <!-- END GENERATED VOICE RULES -->
@@ -114,13 +128,15 @@ MiniMax 接受菜单之外的音色 ID。Fish Audio 的菜单是社区 reference
 | **Voice · Deepgram Aura-2** | `aura-2-thalia-en`、`aura-2-zeus-en`、`aura-2-ama-ja`（日语）等 |
 | **Audio Format** | `mp3` 或 `pcm` |
 
-### Deepgram Flux TTS（免费、仅英语）
+### Deepgram Flux TTS（付费、仅英语）
 
 | 选项 | 值 |
 | --- | --- |
-| **Model** | `deepgram/flux-tts:free` |
+| **Model** | `deepgram/flux-tts` |
 | **Voice · Deepgram Flux** | `flux-haley-en`（美式）、`flux-jack-en`（英式）、`flux-priya-en`（印度）等 |
 | **Audio Format** | `pcm` 或 `mp3` |
+
+旧的 `deepgram/flux-tts:free` 已下架。若升级后仍保留旧设置，插件会提示重新选模型；需要手动选择付费的 Flux TTS 或其他模型。
 
 ### MiniMax Speech 2.8
 
@@ -138,6 +154,28 @@ MiniMax 接受菜单之外的音色 ID。Fish Audio 的菜单是社区 reference
 | **Voice · Fish Audio** | 菜单选择，或选「默认音色」 |
 | **Custom Voice** | 可选。填写任意 [fish.audio](https://fish.audio) 音色页 URL 中的 reference ID，覆盖菜单 |
 | **Audio Format** | `mp3` 或 `pcm` |
+
+### ElevenLabs
+
+| 选项 | 值 |
+| --- | --- |
+| **Model** | `elevenlabs/eleven-v4`、`elevenlabs/eleven-v4-turbo` 或其他 ElevenLabs 预设 |
+| **Voice · ElevenLabs** | `george`（默认）或其他 20 个预置音色；Custom Voice 可填写 ElevenLabs voice ID |
+| **Audio Format** | `Auto` / `pcm` / `mp3` |
+| **Speed** | v3 / v4 系列仅 1.0x；Multilingual / Flash / Turbo v2 系列为 0.7x～1.2x |
+
+[OpenRouter ElevenLabs 说明](https://openrouter.ai/blog/announcements/elevenlabs-on-openrouter/)列出各模型输入上限：v3 系列 5000、v4 / Multilingual v2 为 10000、Flash / Turbo v2 为 30000、v2.5 为 40000 字符。音频标签计入输入长度。v3 / v4 可在 Instructions 或正文中使用 `[whispering]`、`[laughing]` 等标签；语速限制同时参考 [ElevenLabs 模型设置](https://elevenlabs.io/docs/eleven-creative/playground/text-to-speech)。
+
+### HeyGen Voice
+
+| 选项 | 值 |
+| --- | --- |
+| **Model** | `heygen/heygen-voice-1` 或 `heygen/heygen-voice-1-turbo` |
+| **Voice · HeyGen** | `nadine`（默认）或其他 9 个预置音色 |
+| **Audio Format** | `Auto` / `pcm` / `mp3` |
+| **PCM Sample Rate** | `Auto`（响应未声明 rate 时回退 44.1 kHz） |
+
+[HeyGen Voice 模型说明](https://openrouter.ai/heygen/heygen-voice-1)规定单次输入最多 5000 字符。普通朗读时将 Instructions 留空；该选项会作为文本前缀发送。
 
 `API URL` 也支持填写：
 
@@ -169,9 +207,11 @@ Gemini 3.8 使用 OpenRouter 的独立风格参数，提示不会拼进需要朗
 [whispers] This is a secret. [short pause] Please listen carefully.
 ```
 
+标签和风格提示的支持程度取决于模型。除 Gemini 3.8 的独立风格提示外，Instructions 都作为输入前缀；不支持相应标签的模型可能将其读出来。Fish Audio Drama 3 可复用 Fish Audio 菜单，并使用[方括号中的自然语言指令](https://docs.fish.audio/features/text-to-speech/drama-3)。
+
 ## 注意事项
 
-- 单次合成文本长度不能超过 4096 个字符；Seed 为 3000。文本前缀计入限制，Gemini 3.8 的独立风格提示单独限制为 4096 字符。
+- 单次合成输入上限按模型配置校验：Seed 为 3000 字符，HeyGen 为 5000，ElevenLabs 为 5000～40000，其他模型为 4096。文本前缀计入限制，Gemini 3.8 的独立风格提示单独限制为 4096 字符。长文本仍受 105 秒请求超时和 64 MiB 响应上限约束，建议分段合成。
 - 插件优先根据 inline audio / HTTP `Content-Type` 判断响应，明确拒绝 JSON、文本及其他非音频 MIME。明确请求或声明为 PCM 时，MP3 嗅探不会覆盖 PCM 判定；其他响应再用严格校验的 magic bytes 识别 WAV / MP3 / Ogg / FLAC。按裸 PCM 处理的内容会被包装成 16-bit WAV。Auto 优先读取响应 MIME 的 rate / channels；缺失时使用家族采样率和单声道，手动采样率覆盖 rate。无效元数据和不完整的多声道采样帧会报错。
 - OpenRouter 标准 speech 接口支持 MP3 / PCM；Voxtral 仅支持 MP3。已知不兼容的格式会在请求前报错；自定义接口仍可使用其支持的 WAV / Opus / FLAC。
 - `Speed` 仅在非 1.0x 时随请求发送；提供方可能忽略或拒绝不支持的值。验证按钮使用相同语速、格式和 Instructions，能检查这些配置错误。
@@ -217,7 +257,7 @@ python3 scripts/check_catalog.py --snapshot /path/to/models.json
 本地构建 `.bobplugin` 文件（固定 ZIP 条目顺序、时间戳和权限，输出到 `dist/`）：
 
 ```bash
-python3 scripts/release.py --version 1.5.0 --no-appcast
+python3 scripts/release.py --version 1.6.0 --no-appcast
 ```
 
 除了安装包和 Release 说明，构建还会生成 `dist/appcast-entry.json`，其中的 checksum、下载地址和时间戳在发布重试时保持不变。
@@ -225,7 +265,7 @@ python3 scripts/release.py --version 1.5.0 --no-appcast
 ## 发布
 
 1. 更新 `info.json` 版本号（或使用 `--prepare-version`），在 Changelog 加入版本说明；生成目录并运行测试，提交并推送到 `main`。
-2. 给该提交打 tag，例如 `git tag v1.5.0 && git push origin v1.5.0`。
+2. 给该提交打 tag，例如 `git tag v1.6.0 && git push origin v1.6.0`。
 3. Actions 从 tag 检出源码，检查生成文件和实时目录、运行全部测试，再构建安装包和固定的版本记录。
 4. 安装包上传成功后，`publish_appcast.py` 从最新默认分支创建临时 worktree，合并版本记录并提交。若分支在推送前又有更新，最多重新获取并合并三次；包不会被重新构建，已有版本记录会保留。
 
@@ -233,6 +273,7 @@ python3 scripts/release.py --version 1.5.0 --no-appcast
 
 ## Changelog
 
+- **1.6.0** — 同步 2026-10-18 的 35 个 speech 模型，新增 ElevenLabs / HeyGen 音色及 Fish Audio Drama 3，按模型校验输入长度和语速；移除失效的 Flux 免费预设并明确提示手动选择；修复 Gemini 3.8 带路由后缀时风格提示进入朗读文本的问题；升级 CI 和发布 Actions 至 Node 24 兼容版本。
 - **1.5.0** — 修复 PCM 响应采样率 / 声道数与空白前缀误判；新增 Auto 格式、同配置并发请求合并及真实配置验证；统一模型目录并补齐 23 个 speech 模型和 MiniMax / Microsoft 2.1 音色；新增普通提交 / PR CI、实时目录检查和保留版本记录的 appcast 发布重试。
 - **1.4.0** — 同步 OpenRouter speech 模型目录（2026-09-25）：新增 Google Gemini 3.8 Flash TTS / Flash Lite TTS（复用 `Voice · Gemini` 菜单，Voice Design / Replication 的 `voice_...` ID 可填 Custom Voice）、Deepgram Flux TTS 免费档（新增 `Voice · Deepgram Flux` 菜单，36 个英语音色，默认 `flux-haley-en`）；移除已下架的 Zyphra Zonos v0.1 Transformer / Hybrid 预设及 `Voice · Zyphra Zonos` 菜单（OpenRouter 已无可用 endpoint）；共 20 个模型（2026-09-25 以实时 API 复核）。
 - **1.3.2** — PCM Sample Rate 新增 `Auto` 默认档：按模型家族选择包装采样率（Fish Audio 44.1kHz、其他 24kHz），修复 Fish Audio 模型在 `pcm` 格式下声音低沉拖沓（44.1kHz PCM 被按 24kHz 包装导致慢放）；显式选择采样率的行为不变。

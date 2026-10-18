@@ -379,6 +379,48 @@ var MODEL_CATALOG = {
             ],
             "instructionsMode": "prefix",
             "defaultVoice": ""
+        },
+        "elevenlabs": {
+            "prefixes": [
+                "elevenlabs/"
+            ],
+            "contains": [],
+            "voiceOption": "voiceElevenLabs",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 24000,
+            "maxInputChars": 10000,
+            "speedRange": [
+                0.7,
+                1.2
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "george"
+        },
+        "heygen": {
+            "prefixes": [
+                "heygen/"
+            ],
+            "contains": [],
+            "voiceOption": "voiceHeyGen",
+            "optionalVoice": false,
+            "defaultFormat": "pcm",
+            "formats": [
+                "pcm",
+                "mp3"
+            ],
+            "pcmSampleRate": 44100,
+            "maxInputChars": 5000,
+            "speedRange": [
+                0.5,
+                2.0
+            ],
+            "instructionsMode": "prefix",
+            "defaultVoice": "nadine"
         }
     },
     "models": {
@@ -423,7 +465,7 @@ var MODEL_CATALOG = {
         "deepgram/aura-2": {
             "family": "deepgram"
         },
-        "deepgram/flux-tts:free": {
+        "deepgram/flux-tts": {
             "family": "deepgramflux"
         },
         "minimax/speech-2.8-hd": {
@@ -452,6 +494,64 @@ var MODEL_CATALOG = {
         },
         "bytedance-seed/seed-audio-1-0": {
             "family": "seed"
+        },
+        "fish-audio/drama-3": {
+            "family": "fishaudio"
+        },
+        "elevenlabs/eleven-v4": {
+            "family": "elevenlabs",
+            "speedRange": [
+                1.0,
+                1.0
+            ]
+        },
+        "elevenlabs/eleven-v4-turbo": {
+            "family": "elevenlabs",
+            "speedRange": [
+                1.0,
+                1.0
+            ]
+        },
+        "elevenlabs/eleven-v3": {
+            "family": "elevenlabs",
+            "maxInputChars": 5000,
+            "speedRange": [
+                1.0,
+                1.0
+            ]
+        },
+        "elevenlabs/eleven-v3-conversational": {
+            "family": "elevenlabs",
+            "maxInputChars": 5000,
+            "speedRange": [
+                1.0,
+                1.0
+            ]
+        },
+        "elevenlabs/eleven-multilingual-v2": {
+            "family": "elevenlabs"
+        },
+        "elevenlabs/eleven-flash-v2.5": {
+            "family": "elevenlabs",
+            "maxInputChars": 40000
+        },
+        "elevenlabs/eleven-flash-v2": {
+            "family": "elevenlabs",
+            "maxInputChars": 30000
+        },
+        "elevenlabs/eleven-turbo-v2.5": {
+            "family": "elevenlabs",
+            "maxInputChars": 40000
+        },
+        "elevenlabs/eleven-turbo-v2": {
+            "family": "elevenlabs",
+            "maxInputChars": 30000
+        },
+        "heygen/heygen-voice-1": {
+            "family": "heygen"
+        },
+        "heygen/heygen-voice-1-turbo": {
+            "family": "heygen"
         }
     }
 };
@@ -552,8 +652,17 @@ function getModel() {
     return preset === 'custom' ? '' : preset;
 }
 
+function getCatalogModelId(model) {
+    var parts = String(model || '').toLowerCase().split(':');
+    var base = parts.shift();
+    var routingVariants = ['nitro', 'floor', 'exacto', 'online'];
+    return [base].concat(parts.filter(function(suffix) {
+        return routingVariants.indexOf(suffix) === -1;
+    })).join(':');
+}
+
 function getModelFamily(model) {
-    var value = String(model || '').toLowerCase();
+    var value = getCatalogModelId(model);
     var known = MODEL_CATALOG.models[value];
     if (known) {
         return known.family;
@@ -574,7 +683,7 @@ function getModelFamily(model) {
 }
 
 function getModelProfile(model) {
-    var value = String(model || getModel()).toLowerCase();
+    var value = getCatalogModelId(model || getModel());
     var family = getModelFamily(value);
     var defaults = MODEL_CATALOG.families[family] || {
         optionalVoice: false,
@@ -784,6 +893,9 @@ function validateOptions() {
     var apiUrlError = validateApiUrl();
     if (apiUrlError) {
         return apiUrlError;
+    }
+    if (isOpenRouterSpeechApi() && getCatalogModelId(getModel()) === 'deepgram/flux-tts:free') {
+        return { type: 'param', message: 'Flux TTS 免费模型已下架，请手动选择 Flux TTS（付费）或其他模型。' };
     }
     var format = getResponseFormat();
     if (['pcm', 'mp3', 'wav', 'opus', 'flac'].indexOf(format) === -1) {

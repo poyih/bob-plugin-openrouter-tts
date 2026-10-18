@@ -87,8 +87,18 @@ def generated_files(root=ROOT):
         {"title": "Opus (custom API)", "value": "opus"},
         {"title": "FLAC (custom API)", "value": "flac"},
     ]
-    by_id["pcmSampleRate"]["desc"] = "Auto 优先采用响应 Content-Type 中的 rate；缺失时按模型家族回退（Fish Audio 44.1kHz、其他 24kHz）。手动选项覆盖响应采样率；声道数采用响应 channels（缺失时 mono）。"
-    by_id["speed"]["desc"] = "0.5x ~ 2.0x；仅非 1.0x 时发送。验证按钮使用相同语速；提供方可能忽略或拒绝不支持的参数。"
+    by_id["pcmSampleRate"]["desc"] = "Auto 优先采用响应 Content-Type 中的 rate；缺失时按模型配置回退（Fish Audio / HeyGen 44.1kHz、其他 24kHz）。手动选项覆盖响应采样率；声道数采用响应 channels（缺失时 mono）。"
+    by_id["speed"]["desc"] = "默认 1.0x，仅非默认值时发送；允许范围按模型校验。ElevenLabs 部分模型为 0.7x ~ 1.2x，部分仅支持 1.0x。验证按钮使用相同语速。"
+    by_id["speed"]["menuValues"] = [
+        {"title": "0.5x", "value": "0.5"},
+        {"title": "0.7x", "value": "0.7"},
+        {"title": "0.75x", "value": "0.75"},
+        {"title": "1.0x (default)", "value": "1.0"},
+        {"title": "1.2x", "value": "1.2"},
+        {"title": "1.25x", "value": "1.25"},
+        {"title": "1.5x", "value": "1.5"},
+        {"title": "2.0x", "value": "2.0"},
+    ]
     by_id["instructions"]["desc"] = "可选。Gemini 3.8 单独传递风格提示；其他模型作为文本前缀。验证按钮使用相同配置。"
     info["options"] = options
     readme = (root / "README.md").read_text(encoding="utf-8")
@@ -97,17 +107,18 @@ def generated_files(root=ROOT):
     rows = ["每个模型使用对应的 Voice 菜单；Custom Voice 可覆盖菜单。所有菜单会在 Bob 设置中同时显示。", "", "| 模型 | OpenRouter ID | Voice 菜单 | 音色数 | Auto 格式 |", "| --- | --- | --- | --- | --- |"]
     for model in catalog["models"]:
         family = catalog["families"][model["family"]]
+        profile = {**family, **model}
         option = family["voiceOption"]
         menu = option["title"] if option else "Custom Voice（可留空）"
         count = str(len(option["menuValues"])) if option else "默认 / speaker ID"
         if model["family"] == "fishaudio":
             count = "2 + 默认"
-        rows.append(f"| {model['title']} | `{model['id']}` | {menu} | {count} | {family['defaultFormat']} |")
+        rows.append(f"| {model['title']} | `{model['id']}` | {menu} | {count} | {profile['defaultFormat']} |")
     rows += ["", f"目录于 {catalog['verifiedAt']} 与 [OpenRouter speech 模型 API]({catalog['source']}) 核对，共 {len(catalog['models'])} 个模型。模型可用性会变化；发布前运行 `python3 scripts/check_catalog.py` 检查目录漂移。", "", "MiniMax 接受菜单之外的音色 ID。Fish Audio 的菜单是社区 reference ID，不属于官方固定音色列表。Seed 根据输入描述生成音频，Custom Voice 可留空；单次输入最多 3000 字符。Microsoft MAI 2、2.1 和 2.1 Flash 使用不同的 Voice 菜单。"]
     readme = replace_section(readme, "<!-- BEGIN GENERATED MODELS -->", "<!-- END GENERATED MODELS -->", "\n".join(rows))
     if "<!-- BEGIN GENERATED VOICE RULES -->" not in readme:
         readme = re.sub(r"## Voice 选择规则[\s\S]*?(?=## OpenRouter 配置示例)", "## Voice 选择规则\n\n<!-- BEGIN GENERATED VOICE RULES -->\n<!-- END GENERATED VOICE RULES -->\n\n", readme, count=1)
-    rules = ["先按完整模型 ID 查目录，再按家族匹配。Custom Voice 非空时始终优先；清空后恢复对应菜单。", "", "| 家族 | 使用的配置项 | 默认 PCM 采样率 |", "| --- | --- | --- |"]
+    rules = ["查询模型配置时去除 `:nitro` / `:floor` / `:exacto` / `:online` 路由后缀，保留 `:free` 等目录后缀；请求中的模型 ID 原样发送。先查模型目录，再按家族匹配。Custom Voice 非空时始终优先；清空后恢复对应菜单。", "", "| 家族 | 使用的配置项 | 默认 PCM 采样率 |", "| --- | --- | --- |"]
     for name, family in catalog["families"].items():
         option = family["voiceOption"]
         rules.append(f"| {name} | {option['title'] if option else 'Custom Voice（可留空）'} | {family['pcmSampleRate']} Hz |")

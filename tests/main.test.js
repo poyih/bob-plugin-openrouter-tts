@@ -416,21 +416,21 @@ test('Deepgram Flux uses its own voice menu without affecting Aura-2 or Gemini 3
         response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
     });
 
-    const fluxDefault = createFallbackPlugin(options({ model: 'deepgram/flux-tts:free', pcmSampleRate: 'auto' }), respond);
+    const fluxDefault = createFallbackPlugin(options({ model: 'deepgram/flux-tts', pcmSampleRate: 'auto' }), respond);
     const fluxResult = callTts(fluxDefault);
-    assert.equal(fluxDefault.state.requests[0].body.model, 'deepgram/flux-tts:free');
+    assert.equal(fluxDefault.state.requests[0].body.model, 'deepgram/flux-tts');
     assert.equal(fluxDefault.state.requests[0].body.voice, 'flux-haley-en');
     assert.equal(wavSampleRate(fluxResult.result.value), 24000);
 
     const fluxMenu = createFallbackPlugin(
-        options({ model: 'deepgram/flux-tts:free', voiceDeepgramFlux: 'flux-kit-en', voiceDeepgram: 'aura-2-zeus-en' }),
+        options({ model: 'deepgram/flux-tts', voiceDeepgramFlux: 'flux-kit-en', voiceDeepgram: 'aura-2-zeus-en' }),
         respond
     );
     callTts(fluxMenu);
     assert.equal(fluxMenu.state.requests[0].body.voice, 'flux-kit-en');
 
     const fluxCustom = createFallbackPlugin(
-        options({ model: 'deepgram/flux-tts:free', voiceDeepgramFlux: 'flux-kit-en', customVoice: 'flux-renee-en' }),
+        options({ model: 'deepgram/flux-tts', voiceDeepgramFlux: 'flux-kit-en', customVoice: 'flux-renee-en' }),
         respond
     );
     callTts(fluxCustom);
@@ -443,6 +443,33 @@ test('Deepgram Flux uses its own voice menu without affecting Aura-2 or Gemini 3
     const gemini38 = createFallbackPlugin(options({ model: 'google/gemini-3.8-flash-lite-tts', voiceGemini: 'Puck' }), respond);
     callTts(gemini38);
     assert.equal(gemini38.state.requests[0].body.voice, 'Puck');
+});
+
+test('retired Flux free configurations stop before requests without switching to the paid model', () => {
+    for (const field of ['model', 'customModel']) {
+        for (const model of ['deepgram/flux-tts:free', 'deepgram/flux-tts:free:nitro', 'deepgram/flux-tts:floor:free:exacto']) {
+            const plugin = createFallbackPlugin(options({ [field]: model }), () => ({}));
+            const result = callTts(plugin);
+            assert.equal(result.error.type, 'param');
+            assert.match(result.error.message, /免费模型已下架.*手动选择 Flux TTS（付费）或其他模型/);
+            const validation = callPluginValidate(plugin);
+            assert.equal(validation.result, false);
+            assert.match(validation.error.message, /免费模型已下架/);
+            assert.equal(plugin.state.requests.length, 0);
+            assert.equal(plugin.context.getModel(), model);
+        }
+    }
+});
+
+test('custom speech APIs can keep using the Flux free model ID', () => {
+    const model = 'deepgram/flux-tts:free:nitro';
+    const plugin = createFallbackPlugin(options({ apiUrl: 'https://example.test/v1/audio/speech', customModel: model }), () => ({
+        rawData: new MockData([0, 0]), response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    assert.equal(callPluginValidate(plugin).result, true);
+    assert.ok(callTts(plugin).result);
+    assert.equal(plugin.state.requests.length, 2);
+    assert.ok(plugin.state.requests.every((request) => request.body.model === model));
 });
 
 test('info.json catalog stays consistent with the voice families in main.js', () => {
@@ -1128,6 +1155,92 @@ test('Seed can omit voice, defaults to MP3 and enforces its shorter input limit'
     assert.equal(plugin.state.requests.length, 1);
 });
 
+test('October models use their own voice menus and correct Auto PCM sample rates', () => {
+    const cases = [
+        ['elevenlabs/eleven-v4', 'voiceElevenLabs', 'george', 'sarah', 24000],
+        ['heygen/heygen-voice-1', 'voiceHeyGen', 'nadine', 'vincent', 44100],
+        ['heygen/heygen-voice-1-turbo', 'voiceHeyGen', 'nadine', 'vincent', 44100],
+        ['fish-audio/drama-3', 'voiceFishAudio', undefined, 'my-fish-reference', 44100]
+    ];
+    for (const [model, voiceOption, defaultVoice, selectedVoice, rate] of cases) {
+        const settings = options({ model, responseFormat: 'auto', pcmSampleRate: 'auto' });
+        const plugin = createFallbackPlugin(settings, () => ({
+            rawData: new MockData([1, 2, 3, 4]),
+            response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+        }));
+        const result = callTts(plugin);
+        assert.ok(result.result, model);
+        assert.equal(plugin.state.requests[0].body.voice, defaultVoice, model);
+        assert.equal(plugin.state.requests[0].body.response_format, 'pcm', model);
+        assert.equal(Buffer.from(result.result.value, 'base64').readUInt32LE(24), rate, model);
+
+        settings[voiceOption] = selectedVoice;
+        assert.ok(callTts(plugin).result, model);
+        assert.equal(plugin.state.requests[1].body.voice, selectedVoice, model);
+
+        settings.customVoice = 'custom-voice-id';
+        assert.ok(callTts(plugin).result, model);
+        assert.equal(plugin.state.requests[2].body.voice, 'custom-voice-id', model);
+    }
+});
+
+test('new model input limits include prefixes and reject overflow before any network request', () => {
+    for (const [model, limit] of [
+        ['heygen/heygen-voice-1', 5000],
+        ['heygen/heygen-voice-1-turbo', 5000],
+        ['fish-audio/drama-3', 4096],
+        ['elevenlabs/eleven-v4', 10000],
+        ['elevenlabs/eleven-v4-turbo', 10000],
+        ['elevenlabs/eleven-v3', 5000],
+        ['elevenlabs/eleven-v3-conversational', 5000],
+        ['elevenlabs/eleven-multilingual-v2', 10000],
+        ['elevenlabs/eleven-flash-v2', 30000],
+        ['elevenlabs/eleven-turbo-v2', 30000],
+        ['elevenlabs/eleven-flash-v2.5', 40000],
+        ['elevenlabs/eleven-turbo-v2.5', 40000]
+    ]) {
+        const settings = options({ model });
+        const plugin = createFallbackPlugin(settings, () => ({}));
+        assert.equal(plugin.context.getConfiguredSpeechRequest('a'.repeat(limit)).error, undefined, model);
+        assert.match(callTts(plugin, { text: 'a'.repeat(limit + 1) }).error.message, new RegExp(String(limit)), model);
+        settings.instructions = '[excited]';
+        assert.ok(plugin.context.getConfiguredSpeechRequest('a'.repeat(limit - 10)).body, model);
+        assert.ok(plugin.context.getConfiguredSpeechRequest('a'.repeat(limit - 9)).error, model);
+        assert.equal(plugin.state.requests.length, 0, model);
+    }
+});
+
+test('ElevenLabs speed limits follow each model and persist through routing variants', () => {
+    for (const model of [
+        'elevenlabs/eleven-v3', 'elevenlabs/eleven-v3-conversational',
+        'elevenlabs/eleven-v4', 'elevenlabs/eleven-v4-turbo'
+    ]) {
+        for (const suffix of ['', ':nitro']) {
+            const plugin = createFallbackPlugin(options({ customModel: model + suffix, speed: '1.2' }), () => ({}));
+            assert.ok(callTts(plugin).error, model + suffix);
+            assert.equal(callPluginValidate(plugin).result, false);
+            assert.equal(plugin.state.requests.length, 0);
+        }
+    }
+    for (const model of [
+        'elevenlabs/eleven-multilingual-v2', 'elevenlabs/eleven-flash-v2',
+        'elevenlabs/eleven-flash-v2.5', 'elevenlabs/eleven-turbo-v2', 'elevenlabs/eleven-turbo-v2.5'
+    ]) {
+        for (const speed of ['0.7', '1.0', '1.2']) {
+            const plugin = createFallbackPlugin(options({ model, speed }), () => ({
+                rawData: new MockData([0, 0]), response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+            }));
+            assert.ok(callTts(plugin).result, model + ':' + speed);
+            assert.equal(plugin.state.requests[0].body.speed, speed === '1.0' ? undefined : Number(speed));
+        }
+        for (const speed of ['0.5', '1.5']) {
+            const plugin = createFallbackPlugin(options({ model, speed }), () => ({}));
+            assert.ok(callTts(plugin).error, model + ':' + speed);
+            assert.equal(plugin.state.requests.length, 0);
+        }
+    }
+});
+
 test('validation uses configured speed and Instructions with the same limits as TTS', () => {
     const plugin = createFallbackPlugin(options({ speed: '1.5', instructions: '[excited]' }), () => ({
         rawData: new MockData([0, 0]), response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
@@ -1152,6 +1265,38 @@ test('Gemini 3.8 style instructions stay out of spoken text for validation and T
     const body = plugin.state.requests[0].body;
     assert.equal(body.input, 'Hi');
     assert.equal(body.provider.options['google-ai-studio'].speech_metadata.style, 'warm and friendly');
+});
+
+test('routing variants preserve Gemini model capabilities and the requested model ID', () => {
+    for (const baseModel of ['google/gemini-3.8-flash-tts', 'google/gemini-3.8-flash-lite-tts']) {
+        for (const suffix of [':nitro', ':floor', ':exacto', ':online', ':nitro:floor:exacto', ':exacto:online:nitro']) {
+            const model = baseModel + suffix;
+            const plugin = createFallbackPlugin(options({ customModel: model, instructions: 'warm and friendly' }), () => ({
+                rawData: new MockData([0, 0]), response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+            }));
+            assert.equal(callPluginValidate(plugin).result, true, model);
+            assert.ok(callTts(plugin, { text: 'Hi' }).result, model);
+            for (const request of plugin.state.requests) {
+                assert.equal(request.body.model, model);
+                assert.equal(request.body.input, 'Hi');
+                assert.equal(request.body.provider.options['google-ai-studio'].speech_metadata.style, 'warm and friendly');
+                assert.equal(request.body.voice, 'Kore');
+            }
+        }
+    }
+});
+
+test('model metadata resolution keeps catalog and unknown suffixes in any routing suffix order', () => {
+    const plugin = createFallbackPlugin(options(), () => ({}));
+    for (const suffix of ['free', 'batch', 'thinking', 'extended', 'custom']) {
+        const catalogId = 'example/speech:' + suffix;
+        for (const model of [catalogId, catalogId + ':nitro:exacto', 'example/speech:floor:' + suffix + ':online']) {
+            assert.equal(plugin.context.getCatalogModelId(model), catalogId);
+        }
+    }
+    assert.equal(plugin.context.getCatalogModelId('example/nitro:nitro'), 'example/nitro');
+    assert.equal(plugin.context.getCatalogModelId('example/speech:free:unknown:floor'), 'example/speech:free:unknown');
+    assert.equal(plugin.context.getModelProfile('google/gemini-3.8-flash-tts:unknown:nitro').instructionsMode, 'prefix');
 });
 
 test('invalid speed and sample rate configurations fail before any network request', () => {
