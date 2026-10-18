@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.6.0",
+      "desc": "同步 2026-10-18 的 35 个 speech 模型，新增 ElevenLabs / HeyGen 音色及 Fish Audio Drama 3，按模型校验输入长度和语速；移除失效的 Flux 免费预设并明确提示手动选择；修复 Gemini 3.8 带路由后缀时风格提示进入朗读文本的问题；升级 CI 和发布 Actions 至 Node 24 兼容版本",
+      "sha256": "a8568a70456f04796c58bbe87be0cae976779897f4b08a50a1e3e5d68f2618e1",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.6.0/openrouter-tts-1.6.0.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1792302045875
+    },
+    {
       "version": "1.5.0",
       "desc": "修复 PCM 响应采样率 / 声道数与空白前缀误判；新增 Auto 格式、同配置并发请求合并及真实配置验证；统一模型目录并补齐 23 个 speech 模型和 MiniMax / Microsoft 2.1 音色；新增普通提交 / PR CI、实时目录检查和保留版本记录的 appcast 发布重试",
       "sha256": "1dfdccf4674ece98c677810612baf0116ce11c07e8c323fd5dd0584051410ff3",
