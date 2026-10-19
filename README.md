@@ -257,7 +257,7 @@ python3 scripts/check_catalog.py --snapshot /path/to/models.json
 本地构建 `.bobplugin` 文件（固定 ZIP 条目顺序、时间戳和权限，输出到 `dist/`）：
 
 ```bash
-python3 scripts/release.py --version 1.6.1 --no-appcast
+python3 scripts/release.py --version 1.7.0 --no-appcast
 ```
 
 除了安装包和 Release 说明，构建还会生成 `dist/appcast-entry.json`，其中的 checksum、下载地址和时间戳在发布重试时保持不变。
@@ -265,7 +265,7 @@ python3 scripts/release.py --version 1.6.1 --no-appcast
 ## 发布
 
 1. 更新 `info.json` 版本号（或使用 `--prepare-version`），在 Changelog 加入版本说明；生成目录并运行测试，提交并推送到 `main`。
-2. 给该提交打 tag，例如 `git tag v1.6.1 && git push origin v1.6.1`。
+2. 给该提交打 tag，例如 `git tag v1.7.0 && git push origin v1.7.0`。
 3. Actions 从 tag 检出源码，检查生成文件和实时目录、运行全部测试，再构建安装包和固定的版本记录。
 4. 安装包上传成功后，`publish_appcast.py` 从最新默认分支创建临时 worktree，合并版本记录并提交。若分支在推送前又有更新，最多重新获取并合并三次；包不会被重新构建，已有版本记录会保留。
 
@@ -273,7 +273,7 @@ python3 scripts/release.py --version 1.6.1 --no-appcast
 
 ## Changelog
 
-- **1.6.1** — 修复 Gemini 3.8 Flash TTS / Flash Lite TTS 的风格提示在 OpenRouter 将请求路由到 Google Vertex 时被静默丢弃：改用 OpenRouter 文档中的顶层 `instructions` 参数，不再只写入 `google-ai-studio` 的 provider options；支持语言补充 Bob 的挪威语代码 `no`。
+- **1.7.0** — 修复 Gemini 3.8 Flash TTS / Flash Lite TTS 的风格提示在 OpenRouter 将请求路由到 Google Vertex 时被静默丢弃：改用 OpenRouter 文档中的顶层 `instructions` 参数，不再只写入 `google-ai-studio` 的 provider options；支持语言补充 Bob 的挪威语代码 `no`。
 - **1.6.0** — 同步 2026-10-18 的 35 个 speech 模型，新增 ElevenLabs / HeyGen 音色及 Fish Audio Drama 3，按模型校验输入长度和语速；移除失效的 Flux 免费预设并明确提示手动选择；修复 Gemini 3.8 带路由后缀时风格提示进入朗读文本的问题；升级 CI 和发布 Actions 至 Node 24 兼容版本。
 - **1.5.0** — 修复 PCM 响应采样率 / 声道数与空白前缀误判；新增 Auto 格式、同配置并发请求合并及真实配置验证；统一模型目录并补齐 23 个 speech 模型和 MiniMax / Microsoft 2.1 音色；新增普通提交 / PR CI、实时目录检查和保留版本记录的 appcast 发布重试。
 - **1.4.0** — 同步 OpenRouter speech 模型目录（2026-09-25）：新增 Google Gemini 3.8 Flash TTS / Flash Lite TTS（复用 `Voice · Gemini` 菜单，Voice Design / Replication 的 `voice_...` ID 可填 Custom Voice）、Deepgram Flux TTS 免费档（新增 `Voice · Deepgram Flux` 菜单，36 个英语音色，默认 `flux-haley-en`）；移除已下架的 Zyphra Zonos v0.1 Transformer / Hybrid 预设及 `Voice · Zyphra Zonos` 菜单（OpenRouter 已无可用 endpoint）；共 20 个模型（2026-09-25 以实时 API 复核）。
