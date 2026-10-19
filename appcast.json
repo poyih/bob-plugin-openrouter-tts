@@ -2,6 +2,14 @@
   "identifier": "bob-plugin-openrouter-tts",
   "versions": [
     {
+      "version": "1.8.0",
+      "desc": "修复 Gemini 3.8 Flash TTS / Flash Lite TTS 的风格提示在 OpenRouter 将请求路由到 Google Vertex 时被静默丢弃：改用 OpenRouter 文档中的顶层 instructions 参数，不再只写入 google-ai-studio 的 provider options；修复 PCM Sample Rate 选 Auto 与选相同数值的手动设置共用缓存和在途请求、导致手动采样率被忽略的问题，Auto / 手动改为在发出请求时确定；支持语言补充 Bob 的挪威语代码 no",
+      "sha256": "55a39be4d89724e951661ff5c5fbce953b0e8d385e3df9062df11bf255511b41",
+      "url": "https://github.com/poyih/bob-plugin-openrouter-tts/releases/download/v1.8.0/openrouter-tts-1.8.0.bobplugin",
+      "minBobVersion": "1.8.0",
+      "timestamp": 1792404834271
+    },
+    {
       "version": "1.6.0",
       "desc": "同步 2026-10-18 的 35 个 speech 模型，新增 ElevenLabs / HeyGen 音色及 Fish Audio Drama 3，按模型校验输入长度和语速；移除失效的 Flux 免费预设并明确提示手动选择；修复 Gemini 3.8 带路由后缀时风格提示进入朗读文本的问题；升级 CI 和发布 Actions 至 Node 24 兼容版本",
       "sha256": "a8568a70456f04796c58bbe87be0cae976779897f4b08a50a1e3e5d68f2618e1",
