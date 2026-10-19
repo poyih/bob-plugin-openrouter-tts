@@ -267,11 +267,13 @@ function startsWithAscii(base64, value) {
     return Buffer.from(base64, 'base64').subarray(0, value.length).toString('ascii') === value;
 }
 
-test('uses Bob pt-br language code', () => {
+test('uses Bob pt-br and Norwegian language codes', () => {
     const plugin = createFallbackPlugin(options(), () => ({}));
     const languages = Array.from(plugin.context.supportLanguages());
     assert.equal(languages.includes('pt-br'), true);
     assert.equal(languages.includes('pt-BR'), false);
+    assert.equal(languages.includes('no'), true);
+    assert.equal(languages.includes('nb'), true);
 });
 
 test('uses SHA-256 digests for non-sensitive cache keys', () => {
@@ -1250,6 +1252,8 @@ test('validation uses configured speed and Instructions with the same limits as 
     assert.deepEqual(plugin.state.requests[0].body, plugin.state.requests[1].body);
     assert.equal(plugin.state.requests[0].body.input, '[excited] Hi');
     assert.equal(plugin.state.requests[0].body.speed, 1.5);
+    assert.equal(plugin.state.requests[0].body.instructions, undefined);
+    assert.equal(plugin.state.requests[0].body.provider, undefined);
     const overlong = createFallbackPlugin(options({ instructions: 'a'.repeat(4096) }), () => ({}));
     assert.match(callPluginValidate(overlong).error.message, /4096/);
     assert.equal(overlong.state.requests.length, 0);
@@ -1264,7 +1268,14 @@ test('Gemini 3.8 style instructions stay out of spoken text for validation and T
     assert.deepEqual(plugin.state.requests[0].body, plugin.state.requests[1].body);
     const body = plugin.state.requests[0].body;
     assert.equal(body.input, 'Hi');
-    assert.equal(body.provider.options['google-ai-studio'].speech_metadata.style, 'warm and friendly');
+    assert.equal(body.instructions, 'warm and friendly');
+    assert.equal(body.provider, undefined);
+
+    const withoutStyle = createFallbackPlugin(options({ model: 'google/gemini-3.8-flash-lite-tts' }), () => ({
+        rawData: new MockData([0, 0]), response: { statusCode: 200, MIMEType: 'audio/pcm', headers: {} }
+    }));
+    assert.ok(callTts(withoutStyle, { text: 'Hi' }).result);
+    assert.equal(withoutStyle.state.requests[0].body.instructions, undefined);
 });
 
 test('routing variants preserve Gemini model capabilities and the requested model ID', () => {
@@ -1279,7 +1290,7 @@ test('routing variants preserve Gemini model capabilities and the requested mode
             for (const request of plugin.state.requests) {
                 assert.equal(request.body.model, model);
                 assert.equal(request.body.input, 'Hi');
-                assert.equal(request.body.provider.options['google-ai-studio'].speech_metadata.style, 'warm and friendly');
+                assert.equal(request.body.instructions, 'warm and friendly');
                 assert.equal(request.body.voice, 'Kore');
             }
         }

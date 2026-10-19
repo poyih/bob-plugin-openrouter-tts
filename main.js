@@ -629,7 +629,7 @@ function supportLanguages() {
         'ar', 'th', 'vi', 'id', 'ms', 'tr', 'pl',
         'nl', 'sv', 'da', 'nb', 'fi', 'el', 'cs',
         'ro', 'hu', 'sk', 'uk', 'bg', 'hr', 'hi',
-        'bn', 'ta', 'te', 'ml', 'he', 'fil'
+        'bn', 'ta', 'te', 'ml', 'he', 'fil', 'no'
     ];
 }
 
@@ -1479,8 +1479,10 @@ function getConfiguredSpeechRequest(text) {
         sampleRate: getSampleRate(), instructions: instructions, text: text, inputText: inputText
     };
     config.body = buildSpeechRequestBody(inputText, model, config.voice, config.format, config.speed);
+    // 顶层 instructions 由 OpenRouter 转为 speech_metadata.style；按 provider slug 传的 options
+    // 在请求路由到 Vertex 等其他 Google 端点时会被丢弃。
     if (instructions && profile.instructionsMode === 'googleStyle') {
-        config.body.provider = { options: { 'google-ai-studio': { speech_metadata: { style: instructions } } } };
+        config.body.instructions = instructions;
     }
     return config;
 }
