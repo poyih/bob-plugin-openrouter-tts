@@ -721,9 +721,13 @@ function getSpeed() {
     return value ? Number(value) : 1.0;
 }
 
-function getSampleRate() {
+function isManualSampleRate() {
     var value = readOption('pcmSampleRate');
-    return value && value !== 'auto' ? Number(value) : getModelProfile(getModel()).pcmSampleRate;
+    return !!value && value !== 'auto';
+}
+
+function getSampleRate() {
+    return isManualSampleRate() ? Number(readOption('pcmSampleRate')) : getModelProfile(getModel()).pcmSampleRate;
 }
 
 function isOpenRouterSpeechApi() {
@@ -1058,7 +1062,7 @@ function getApiKeyCacheScope(apiKey) {
     return digest;
 }
 
-function makeCacheKey(text, lang, apiUrl, model, voice, instructions, format, speed, sampleRate, apiKeyScope) {
+function makeCacheKey(text, lang, apiUrl, model, voice, instructions, format, speed, sampleRate, manualSampleRate, apiKeyScope) {
     return sha256Hex(JSON.stringify([
         apiKeyScope,
         apiUrl,
@@ -1068,6 +1072,8 @@ function makeCacheKey(text, lang, apiUrl, model, voice, instructions, format, sp
         format,
         String(speed),
         String(sampleRate),
+        // Auto 采用响应声明的 rate，同一数值的手动设置会强制覆盖，两者的结果不能共用。
+        manualSampleRate ? 'manual' : 'auto',
         lang || '',
         text || ''
     ]));
@@ -1336,7 +1342,7 @@ function writeString(view, offset, str) {
     }
 }
 
-function resolvePcmMetadata(mimeType, fallbackRate) {
+function resolvePcmMetadata(mimeType, fallbackRate, manualSampleRate) {
     var parameters = {};
     String(mimeType || '').split(';').slice(1).forEach(function(part) {
         var match = /^\s*(rate|channels)\s*=\s*(?:"([^"]*)"|([^\s]+))\s*$/i.exec(part);
@@ -1354,9 +1360,7 @@ function resolvePcmMetadata(mimeType, fallbackRate) {
             throw new Error('PCM 元数据无效');
         }
     });
-    var rateOption = readOption('pcmSampleRate');
-    var manualRate = rateOption && rateOption !== 'auto';
-    var rate = manualRate ? fallbackRate : parameters.rate === undefined ? fallbackRate : parameters.rate;
+    var rate = manualSampleRate ? fallbackRate : parameters.rate === undefined ? fallbackRate : parameters.rate;
     var channels = parameters.channels === undefined ? 1 : parameters.channels;
     if (!isFinite(rate) || rate < 1000 || rate > 384000 || Math.floor(rate) !== rate ||
         !isFinite(channels) || channels < 1 || channels > 32 || Math.floor(channels) !== channels) {
@@ -1476,7 +1480,8 @@ function getConfiguredSpeechRequest(text) {
     var config = {
         apiKey: readOption('apiKey'), apiUrl: getApiUrl(), model: model,
         voice: getVoice(), format: getResponseFormat(), speed: getSpeed(),
-        sampleRate: getSampleRate(), instructions: instructions, text: text, inputText: inputText
+        sampleRate: getSampleRate(), manualSampleRate: isManualSampleRate(),
+        instructions: instructions, text: text, inputText: inputText
     };
     config.body = buildSpeechRequestBody(inputText, model, config.voice, config.format, config.speed);
     // 顶层 instructions 由 OpenRouter 转为 speech_metadata.style；按 provider slug 传的 options
@@ -2177,7 +2182,7 @@ function mimeTypeToContainer(mimeType) {
     return '';
 }
 
-function processAudioBase64(audioBase64, format, mimeType, sampleRate) {
+function processAudioBase64(audioBase64, format, mimeType, sampleRate, manualSampleRate) {
     audioBase64 = normalizeBase64AudioData(audioBase64);
     var lowerMimeType = String(mimeType || '').toLowerCase();
     var shouldTreatAsPcm = String(format || '').toLowerCase() === 'pcm' ||
@@ -2198,7 +2203,7 @@ function processAudioBase64(audioBase64, format, mimeType, sampleRate) {
         if (base64DecodedByteLength(audioBase64) % 2 !== 0) {
             throw new Error('16-bit PCM 音频字节数必须为偶数');
         }
-        var metadata = resolvePcmMetadata(mimeType, sampleRate);
+        var metadata = resolvePcmMetadata(mimeType, sampleRate, manualSampleRate);
         var nativeWavBase64 = pcmBase64ToWavNative(audioBase64, metadata.sampleRate, metadata.channels);
         if (nativeWavBase64) {
             return { value: nativeWavBase64, outputFormat: 'wav' };
@@ -2222,7 +2227,7 @@ function readDataPrefix(data, byteCount, knownLength) {
     return bytes;
 }
 
-function processAudioData(rawData, format, mimeType, sampleRate, knownLength) {
+function processAudioData(rawData, format, mimeType, sampleRate, knownLength, manualSampleRate) {
     var lowerMimeType = String(mimeType || '').toLowerCase();
     var shouldTreatAsPcm = String(format || '').toLowerCase() === 'pcm' ||
         lowerMimeType.indexOf('pcm') !== -1 ||
@@ -2245,7 +2250,7 @@ function processAudioData(rawData, format, mimeType, sampleRate, knownLength) {
         if (rawDataLength % 2 !== 0) {
             throw new Error('16-bit PCM 音频字节数必须为偶数');
         }
-        var metadata = resolvePcmMetadata(mimeType, sampleRate);
+        var metadata = resolvePcmMetadata(mimeType, sampleRate, manualSampleRate);
         var nativeWavBase64 = pcmDataToWavBase64(rawData, metadata.sampleRate, rawDataLength, metadata.channels);
         if (nativeWavBase64) {
             return { value: nativeWavBase64, outputFormat: 'wav' };
@@ -2256,11 +2261,11 @@ function processAudioData(rawData, format, mimeType, sampleRate, knownLength) {
     return { value: rawData.toBase64(), outputFormat: format || 'audio' };
 }
 
-function processAudioPayload(payload, format, sampleRate) {
+function processAudioPayload(payload, format, sampleRate, manualSampleRate) {
     if (payload && payload.rawData) {
-        return processAudioData(payload.rawData, format, payload.mimeType, sampleRate, payload.byteLength);
+        return processAudioData(payload.rawData, format, payload.mimeType, sampleRate, payload.byteLength, manualSampleRate);
     }
-    return processAudioBase64(payload ? payload.data : '', format, payload ? payload.mimeType : '', sampleRate);
+    return processAudioBase64(payload ? payload.data : '', format, payload ? payload.mimeType : '', sampleRate, manualSampleRate);
 }
 
 function createAudioTooLargeError() {
@@ -2336,7 +2341,7 @@ function pluginValidate(completion) {
                 completion({ result: false, error: { type: 'api', message: 'OpenRouter TTS 服务没有返回音频数据。' } });
                 return;
             }
-            var processed = processAudioPayload(payload, format, sampleRate);
+            var processed = processAudioPayload(payload, format, sampleRate, config.manualSampleRate);
             payload.rawData = null;
             if (!processed || !processed.value) {
                 throw new Error('音频转换结果为空');
@@ -2363,6 +2368,7 @@ function tts(query, completion) {
     var format = config.format;
     var speed = config.speed;
     var sampleRate = config.sampleRate;
+    var manualSampleRate = config.manualSampleRate;
     var instructions = config.instructions;
     var text = config.text;
     var inputText = config.inputText;
@@ -2381,6 +2387,7 @@ function tts(query, completion) {
         format,
         speed,
         sampleRate,
+        manualSampleRate,
         apiKeyCacheScope
     );
     var cachedEntry = getCachedAudioResult(cacheKey);
@@ -2510,7 +2517,7 @@ function tts(query, completion) {
             var sourceSizeLog = audioPayload.rawData
                 ? ' source_bytes=' + getDataLength(audioPayload.rawData, audioPayload.byteLength)
                 : ' source_base64_chars=' + audioPayload.data.length;
-            var processed = processAudioPayload(audioPayload, format, sampleRate);
+            var processed = processAudioPayload(audioPayload, format, sampleRate, manualSampleRate);
             audioPayload.rawData = null;
             var convertElapsedMs = nowMs() - convertStartedAt;
             var totalElapsedMs = nowMs() - requestStartedAt;
