@@ -296,6 +296,7 @@ test('uses SHA-256 digests for non-sensitive cache keys', () => {
         'pcm',
         1,
         24000,
+        false,
         plugin.context.getApiKeyCacheScope('sk-private-key')
     );
     assert.match(key, /^[0-9a-f]{64}$/);
@@ -792,6 +793,24 @@ test('PCM sample rate and API-key scope are part of the cache key', () => {
     pluginOptions.apiKey = 'sk-test-one';
     callTts(plugin, { text: 'cache me' });
     assert.equal(plugin.state.requests.length, 4);
+});
+
+test('Auto and an equal manual PCM sample rate never share cached audio', () => {
+    const settings = options({ pcmSampleRate: 'auto' });
+    const plugin = createFallbackPlugin(settings, () => ({
+        rawData: new MockData(Buffer.alloc(8)),
+        response: { statusCode: 200, headers: { 'Content-Type': 'audio/pcm; rate=48000' } }
+    }));
+    assert.equal(wavSampleRate(callTts(plugin, { text: 'same' }).result.value), 48000);
+    settings.pcmSampleRate = '24000';
+    const manual = callTts(plugin, { text: 'same' });
+    assert.equal(plugin.state.requests.length, 2);
+    assert.equal(manual.result.raw.cache, 'miss');
+    assert.equal(wavSampleRate(manual.result.value), 24000);
+    settings.pcmSampleRate = 'auto';
+    const auto = callTts(plugin, { text: 'same' });
+    assert.equal(auto.result.raw.cache, 'hit');
+    assert.equal(wavSampleRate(auto.result.value), 48000);
 });
 
 test('cache expiry timer removes idle entries without another lookup', () => {
@@ -1347,6 +1366,24 @@ test('shared request failure notifies every caller, clears state and permits ret
     assert.equal(plugin.state.pending.length, 2);
     completeDeferredRequest(plugin.state.pending[1], [0, 0]);
     assert.ok(results[2].result);
+});
+
+test('in-flight PCM requests keep the Auto or manual sample rate chosen at request time', () => {
+    const settings = options({ pcmSampleRate: '24000' });
+    const plugin = createDeferredPlugin(settings);
+    const results = [];
+    plugin.context.tts({ text: 'same', lang: 'en' }, (output) => results.push(output));
+    settings.pcmSampleRate = 'auto';
+    plugin.context.tts({ text: 'same', lang: 'en' }, (output) => results.push(output));
+    assert.equal(plugin.state.pending.length, 2);
+    for (const request of plugin.state.pending) {
+        request.streamHandler({ rawData: new MockData([0, 0, 0, 0]) });
+        request.handler({ response: { statusCode: 200, headers: { 'Content-Type': 'audio/pcm; rate=48000' } } });
+    }
+    assert.equal(wavSampleRate(results[0].result.value), 24000);
+    assert.equal(wavSampleRate(results[1].result.value), 48000);
+    settings.pcmSampleRate = '24000';
+    assert.equal(wavSampleRate(callTts(plugin, { text: 'same' }).result.value), 24000);
 });
 
 test('changing effective request options prevents in-flight sharing', () => {
